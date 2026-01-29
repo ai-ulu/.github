@@ -66,14 +66,14 @@ This implementation plan breaks down the AutoQA Pilot system into incremental de
     - _Requirements: 1.4, 1.5, 1.6_
 
 - [x] 3. Redis setup and caching infrastructure
-  - [-] 3.1 Configure Redis for caching and rate limiting
+  - [x] 3.1 Configure Redis for caching and rate limiting
     - Set up Redis connection with proper error handling
     - Configure cache TTL strategies for different data types
     - Implement rate limiting with Redis-based counters
     - Set up cache stampede prevention mechanisms
     - _Requirements: 9.4 (rate limiting), 8.1-8.5 (scheduling)_
 
-  - [-]* 3.2 Write property tests for caching consistency
+  - [x]* 3.2 Write property tests for caching consistency
     - **Property 24: Cache Consistency and Performance**
     - **Validates: Production Checklist - Cache & Consistency**
     - Test cache-database consistency across operations
@@ -88,14 +88,14 @@ This implementation plan breaks down the AutoQA Pilot system into incremental de
 ### Phase 2: Authentication and User Management
 
 - [ ] 4. Implement GitHub OAuth authentication
-  - [ ] 4.1 Set up GitHub OAuth integration
+  - [x] 4.1 Set up GitHub OAuth integration
     - Configure OAuth app credentials and callback URLs
     - Implement OAuth flow with proper state validation
     - Set up JWT token generation and validation
     - Implement session management with Redis
     - _Requirements: 1.1, 1.2, 1.3_
 
-  - [ ]* 4.2 Write property tests for authentication flow
+  - [x]* 4.2 Write property tests for authentication flow
     - Test OAuth state validation across all scenarios
     - Verify JWT token generation and validation consistency
     - Test session management and expiry behavior

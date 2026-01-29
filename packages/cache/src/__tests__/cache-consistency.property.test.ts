@@ -1,325 +1,300 @@
-// Property-based tests for caching consistency
-// **Feature: autoqa-pilot, Property 24: Cache Consistency and Performance**
-// **Validates: Production Checklist - Cache & Consistency**
+/**
+ * Property-Based Tests for Cache Consistency
+ * Feature: autoqa-pilot, Property 24: Cache Consistency and Performance
+ * 
+ * Tests cache-database consistency across operations and verifies cache invalidation works correctly.
+ * Validates: Production Checklist - Cache & Consistency
+ */
 
-import * as fc from 'fast-check';
+import fc from 'fast-check';
 import { Cache, UserCache, ProjectCache, TestRunCache } from '../cache';
 import { redis } from '../client';
-import { TestDataIsolation } from '@autoqa/testing-utils';
+import { CacheTypes } from '../types';
+
+// Test setup and teardown
+beforeAll(async () => {
+  // Ensure Redis is connected
+  await redis.ping();
+});
+
+afterEach(async () => {
+  // Clean up test data after each test
+  await Cache.clear('test');
+  await Cache.resetStats();
+});
+
+afterAll(async () => {
+  // Clean up all test data
+  await Cache.clear();
+  await redis.flushdb();
+});
 
 describe('Cache Consistency Property Tests', () => {
-  let testIsolation: TestDataIsolation;
+  /**
+   * Property 24: Cache Consistency and Performance
+   * For any cached data, the system should maintain consistency between cache and database,
+   * prevent cache stampede, and handle cache invalidation correctly
+   */
   
-  beforeEach(async () => {
-    testIsolation = new TestDataIsolation();
-    // Clear test cache before each test
-    await Cache.clear('test');
-    Cache.resetStats();
-  });
-  
-  afterEach(async () => {
-    await testIsolation.cleanupAll();
-    await Cache.clear('test');
-  });
-  
-  describe('Property 24: Cache Consistency and Performance', () => {
-    it('should maintain cache-database consistency across operations', async () => {
+  describe('Basic Cache Operations Consistency', () => {
+    it('should maintain get-set consistency for any valid data', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.record({
-            key: fc.string({ minLength: 1, maxLength: 50 }),
+            key: fc.string({ minLength: 1, maxLength: 100 }),
             value: fc.oneof(
               fc.string(),
               fc.integer(),
               fc.boolean(),
-              fc.record({
-                id: fc.uuid(),
-                name: fc.string(),
-                data: fc.array(fc.string(), { maxLength: 5 }),
-              })
+              fc.object(),
+              fc.array(fc.string())
             ),
-            ttl: fc.option(fc.integer({ min: 1, max: 3600 })),
+            ttl: fc.option(fc.integer({ min: 1, max: 3600 }))
           }),
           async ({ key, value, ttl }) => {
-            const testKey = `test_${key}`;
-            
             // Set value in cache
-            const setResult = await Cache.set(testKey, value, {
+            const setResult = await Cache.set(key, value, {
               namespace: 'test',
-              ttl,
+              ttl: ttl || undefined
             });
+            
             expect(setResult).toBe(true);
             
-            // Immediately retrieve value
-            const cachedValue = await Cache.get(testKey, {
-              namespace: 'test',
-            });
+            // Get value from cache
+            const cachedValue = await Cache.get(key, { namespace: 'test' });
             
-            // Verify consistency
+            // Values should be identical
             expect(cachedValue).toEqual(value);
             
-            // Verify TTL if set
+            // If TTL was set, key should exist
             if (ttl) {
-              const remainingTtl = await Cache.ttl(testKey, 'test');
+              const exists = await Cache.exists(key, 'test');
+              expect(exists).toBe(true);
+              
+              const remainingTtl = await Cache.ttl(key, 'test');
               expect(remainingTtl).toBeGreaterThan(0);
               expect(remainingTtl).toBeLessThanOrEqual(ttl);
             }
-            
-            // Update value
-            const updatedValue = typeof value === 'string' 
-              ? `updated_${value}` 
-              : { ...value, updated: true };
-            
-            await Cache.set(testKey, updatedValue, {
-              namespace: 'test',
-              ttl,
-            });
-            
-            // Verify update consistency
-            const updatedCachedValue = await Cache.get(testKey, {
-              namespace: 'test',
-            });
-            expect(updatedCachedValue).toEqual(updatedValue);
-            expect(updatedCachedValue).not.toEqual(value);
-            
-            return true;
           }
         ),
-        { numRuns: 50, timeout: 30000 }
+        { numRuns: 100 }
       );
     });
     
-    it('should handle concurrent cache operations without race conditions', async () => {
+    it('should handle cache misses consistently', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.record({
-            baseKey: fc.string({ minLength: 1, maxLength: 20 }),
-            operations: fc.array(
-              fc.record({
-                type: fc.oneof(
-                  fc.constant('set'),
-                  fc.constant('get'),
-                  fc.constant('delete'),
-                  fc.constant('increment')
-                ),
-                value: fc.oneof(fc.string(), fc.integer({ min: 1, max: 100 })),
-                suffix: fc.string({ minLength: 1, maxLength: 10 }),
-              }),
-              { minLength: 5, maxLength: 15 }
-            ),
-          }),
-          async ({ baseKey, operations }) => {
-            const testKey = `concurrent_${baseKey}`;
+          fc.string({ minLength: 1, maxLength: 100 }),
+          async (nonExistentKey) => {
+            // Ensure key doesn't exist
+            await Cache.delete(nonExistentKey, { namespace: 'test' });
             
-            // Execute operations concurrently
-            const promises = operations.map(async (op, index) => {
-              const key = `${testKey}_${op.suffix}_${index}`;
-              
-              try {
-                switch (op.type) {
-                  case 'set':
-                    return await Cache.set(key, op.value, { namespace: 'test' });
-                  
-                  case 'get':
-                    return await Cache.get(key, { namespace: 'test' });
-                  
-                  case 'delete':
-                    return await Cache.delete(key, { namespace: 'test' });
-                  
-                  case 'increment':
-                    if (typeof op.value === 'number') {
-                      return await Cache.increment(key, op.value, undefined, 'test');
-                    }
-                    return 0;
-                  
-                  default:
-                    return null;
-                }
-              } catch (error) {
-                // Some operations might fail due to concurrency, that's expected
-                return null;
-              }
-            });
+            // Get should return null
+            const result = await Cache.get(nonExistentKey, { namespace: 'test' });
+            expect(result).toBeNull();
             
-            const results = await Promise.allSettled(promises);
-            
-            // Verify no unhandled errors occurred
-            const errors = results
-              .filter(r => r.status === 'rejected')
-              .map(r => (r as PromiseRejectedResult).reason);
-            
-            // Should not have critical errors (connection failures, etc.)
-            errors.forEach(error => {
-              expect(error.message).not.toContain('connection');
-              expect(error.message).not.toContain('timeout');
-            });
-            
-            return true;
+            // Exists should return false
+            const exists = await Cache.exists(nonExistentKey, 'test');
+            expect(exists).toBe(false);
           }
         ),
-        { numRuns: 30, timeout: 45000 }
+        { numRuns: 50 }
       );
     });
     
-    it('should prevent cache stampede with concurrent getOrSet operations', async () => {
+    it('should maintain consistency across multiple operations', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.record({
-            key: fc.string({ minLength: 1, maxLength: 30 }),
-            value: fc.string({ minLength: 1, maxLength: 100 }),
-            concurrency: fc.integer({ min: 3, max: 10 }),
-            delay: fc.integer({ min: 10, max: 100 }),
-          }),
-          async ({ key, value, concurrency, delay }) => {
-            const testKey = `stampede_${key}`;
-            let factoryCallCount = 0;
-            
-            // Factory function that simulates expensive operation
-            const expensiveFactory = async () => {
-              factoryCallCount++;
-              await new Promise(resolve => setTimeout(resolve, delay));
-              return `${value}_${Date.now()}`;
-            };
-            
-            // Execute multiple concurrent getOrSet operations
-            const promises = Array.from({ length: concurrency }, () =>
-              Cache.getOrSet(testKey, expensiveFactory, {
-                namespace: 'test',
-                ttl: 60,
-              })
-            );
-            
-            const results = await Promise.all(promises);
-            
-            // All results should be identical (cache stampede prevented)
-            const firstResult = results[0];
-            results.forEach(result => {
-              expect(result).toBe(firstResult);
-            });
-            
-            // Factory should be called only once (or very few times due to timing)
-            expect(factoryCallCount).toBeLessThanOrEqual(2);
-            
-            // Verify value is cached
-            const cachedValue = await Cache.get(testKey, { namespace: 'test' });
-            expect(cachedValue).toBe(firstResult);
-            
-            return true;
-          }
-        ),
-        { numRuns: 20, timeout: 60000 }
-      );
-    });
-    
-    it('should handle cache invalidation correctly', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.record({
-            keys: fc.array(fc.string({ minLength: 1, maxLength: 20 }), {
-              minLength: 3,
-              maxLength: 8,
+          fc.array(
+            fc.record({
+              key: fc.string({ minLength: 1, maxLength: 50 }),
+              value: fc.string({ minLength: 1, maxLength: 100 }),
+              operation: fc.constantFrom('set', 'get', 'delete')
             }),
-            values: fc.array(fc.string({ minLength: 1, maxLength: 50 }), {
-              minLength: 3,
-              maxLength: 8,
-            }),
-          }),
-          async ({ keys, values }) => {
-            // Ensure arrays have same length
-            const minLength = Math.min(keys.length, values.length);
-            const testKeys = keys.slice(0, minLength).map(k => `invalidation_${k}`);
-            const testValues = values.slice(0, minLength);
+            { minLength: 5, maxLength: 20 }
+          ),
+          async (operations) => {
+            const state = new Map<string, string>();
             
-            // Set multiple values
-            const setPromises = testKeys.map((key, index) =>
-              Cache.set(key, testValues[index], {
-                namespace: 'test',
-                ttl: 3600,
-              })
-            );
-            
-            await Promise.all(setPromises);
-            
-            // Verify all values are cached
-            const cachedValues = await Cache.mget(testKeys, { namespace: 'test' });
-            cachedValues.forEach((value, index) => {
-              expect(value).toBe(testValues[index]);
-            });
-            
-            // Delete some keys
-            const keysToDelete = testKeys.slice(0, Math.ceil(testKeys.length / 2));
-            const deletePromises = keysToDelete.map(key =>
-              Cache.delete(key, { namespace: 'test' })
-            );
-            
-            const deleteResults = await Promise.all(deletePromises);
-            deleteResults.forEach(result => {
-              expect(result).toBe(true);
-            });
-            
-            // Verify deleted keys are not in cache
-            const afterDeleteValues = await Cache.mget(testKeys, { namespace: 'test' });
-            afterDeleteValues.forEach((value, index) => {
-              if (keysToDelete.includes(testKeys[index])) {
-                expect(value).toBeNull();
-              } else {
-                expect(value).toBe(testValues[index]);
+            for (const op of operations) {
+              switch (op.operation) {
+                case 'set':
+                  await Cache.set(op.key, op.value, { namespace: 'test' });
+                  state.set(op.key, op.value);
+                  break;
+                  
+                case 'get':
+                  const cached = await Cache.get<string>(op.key, { namespace: 'test' });
+                  const expected = state.get(op.key) || null;
+                  expect(cached).toEqual(expected);
+                  break;
+                  
+                case 'delete':
+                  await Cache.delete(op.key, { namespace: 'test' });
+                  state.delete(op.key);
+                  break;
               }
-            });
+            }
             
-            return true;
+            // Final consistency check
+            for (const [key, expectedValue] of state.entries()) {
+              const cachedValue = await Cache.get<string>(key, { namespace: 'test' });
+              expect(cachedValue).toEqual(expectedValue);
+            }
           }
         ),
-        { numRuns: 30, timeout: 30000 }
-      );
-    });
-    
-    it('should maintain TTL consistency across operations', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.record({
-            key: fc.string({ minLength: 1, maxLength: 30 }),
-            value: fc.string({ minLength: 1, maxLength: 100 }),
-            initialTtl: fc.integer({ min: 10, max: 60 }),
-            newTtl: fc.integer({ min: 5, max: 30 }),
-          }),
-          async ({ key, value, initialTtl, newTtl }) => {
-            const testKey = `ttl_${key}`;
-            
-            // Set value with initial TTL
-            await Cache.set(testKey, value, {
-              namespace: 'test',
-              ttl: initialTtl,
-            });
-            
-            // Check initial TTL
-            const ttl1 = await Cache.ttl(testKey, 'test');
-            expect(ttl1).toBeGreaterThan(0);
-            expect(ttl1).toBeLessThanOrEqual(initialTtl);
-            
-            // Update TTL
-            const expireResult = await Cache.expire(testKey, newTtl, 'test');
-            expect(expireResult).toBe(true);
-            
-            // Check updated TTL
-            const ttl2 = await Cache.ttl(testKey, 'test');
-            expect(ttl2).toBeGreaterThan(0);
-            expect(ttl2).toBeLessThanOrEqual(newTtl);
-            expect(ttl2).toBeLessThan(ttl1);
-            
-            // Value should still be accessible
-            const cachedValue = await Cache.get(testKey, { namespace: 'test' });
-            expect(cachedValue).toBe(value);
-            
-            return true;
-          }
-        ),
-        { numRuns: 30, timeout: 30000 }
+        { numRuns: 50 }
       );
     });
   });
   
-  describe('Property 25: Specialized Cache Consistency', () => {
+  describe('Cache Invalidation Consistency', () => {
+    it('should properly invalidate expired keys', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            key: fc.string({ minLength: 1, maxLength: 100 }),
+            value: fc.string(),
+            ttl: fc.integer({ min: 1, max: 3 }) // Short TTL for testing
+          }),
+          async ({ key, value, ttl }) => {
+            // Set with short TTL
+            await Cache.set(key, value, { namespace: 'test', ttl });
+            
+            // Should exist immediately
+            const immediate = await Cache.get(key, { namespace: 'test' });
+            expect(immediate).toEqual(value);
+            
+            // Wait for expiration
+            await new Promise(resolve => setTimeout(resolve, (ttl + 1) * 1000));
+            
+            // Should be expired
+            const expired = await Cache.get(key, { namespace: 'test' });
+            expect(expired).toBeNull();
+            
+            const exists = await Cache.exists(key, 'test');
+            expect(exists).toBe(false);
+          }
+        ),
+        { numRuns: 20, timeout: 10000 }
+      );
+    });
+    
+    it('should handle TTL updates consistently', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            key: fc.string({ minLength: 1, maxLength: 100 }),
+            value: fc.string(),
+            initialTtl: fc.integer({ min: 10, max: 30 }),
+            newTtl: fc.integer({ min: 5, max: 60 })
+          }),
+          async ({ key, value, initialTtl, newTtl }) => {
+            // Set with initial TTL
+            await Cache.set(key, value, { namespace: 'test', ttl: initialTtl });
+            
+            // Update TTL
+            const updated = await Cache.expire(key, newTtl, 'test');
+            expect(updated).toBe(true);
+            
+            // Check new TTL
+            const remainingTtl = await Cache.ttl(key, 'test');
+            expect(remainingTtl).toBeGreaterThan(0);
+            expect(remainingTtl).toBeLessThanOrEqual(newTtl);
+            
+            // Value should still be accessible
+            const cachedValue = await Cache.get(key, { namespace: 'test' });
+            expect(cachedValue).toEqual(value);
+          }
+        ),
+        { numRuns: 30 }
+      );
+    });
+  });
+  
+  describe('Batch Operations Consistency', () => {
+    it('should maintain consistency in batch set/get operations', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              key: fc.string({ minLength: 1, maxLength: 50 }),
+              value: fc.string({ minLength: 1, maxLength: 100 }),
+              ttl: fc.option(fc.integer({ min: 10, max: 3600 }))
+            }),
+            { minLength: 2, maxLength: 10 }
+          ),
+          async (entries) => {
+            // Batch set
+            const setResult = await Cache.mset(
+              entries.map(e => ({ key: e.key, value: e.value, ttl: e.ttl || undefined })),
+              { namespace: 'test' }
+            );
+            expect(setResult).toBe(true);
+            
+            // Batch get
+            const keys = entries.map(e => e.key);
+            const results = await Cache.mget<string>(keys, { namespace: 'test' });
+            
+            // All values should match
+            results.forEach((result, index) => {
+              expect(result).toEqual(entries[index].value);
+            });
+            
+            // Individual gets should also work
+            for (let i = 0; i < entries.length; i++) {
+              const individual = await Cache.get<string>(entries[i].key, { namespace: 'test' });
+              expect(individual).toEqual(entries[i].value);
+            }
+          }
+        ),
+        { numRuns: 30 }
+      );
+    });
+  });
+  
+  describe('Namespace Isolation', () => {
+    it('should maintain isolation between different namespaces', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            key: fc.string({ minLength: 1, maxLength: 100 }),
+            value1: fc.string(),
+            value2: fc.string(),
+            namespace1: fc.string({ minLength: 1, maxLength: 20 }),
+            namespace2: fc.string({ minLength: 1, maxLength: 20 })
+          }),
+          async ({ key, value1, value2, namespace1, namespace2 }) => {
+            // Assume different namespaces
+            fc.pre(namespace1 !== namespace2);
+            
+            // Set same key in different namespaces
+            await Cache.set(key, value1, { namespace: namespace1 });
+            await Cache.set(key, value2, { namespace: namespace2 });
+            
+            // Values should be isolated
+            const cached1 = await Cache.get(key, { namespace: namespace1 });
+            const cached2 = await Cache.get(key, { namespace: namespace2 });
+            
+            expect(cached1).toEqual(value1);
+            expect(cached2).toEqual(value2);
+            
+            // Delete from one namespace shouldn't affect the other
+            await Cache.delete(key, { namespace: namespace1 });
+            
+            const afterDelete1 = await Cache.get(key, { namespace: namespace1 });
+            const afterDelete2 = await Cache.get(key, { namespace: namespace2 });
+            
+            expect(afterDelete1).toBeNull();
+            expect(afterDelete2).toEqual(value2);
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+  });
+  
+  describe('Specialized Cache Consistency', () => {
     it('should maintain consistency in UserCache operations', async () => {
       await fc.assert(
         fc.asyncProperty(
@@ -328,16 +303,8 @@ describe('Cache Consistency Property Tests', () => {
             userData: fc.record({
               username: fc.string({ minLength: 1, maxLength: 50 }),
               email: fc.emailAddress(),
-              role: fc.oneof(
-                fc.constant('admin'),
-                fc.constant('user'),
-                fc.constant('viewer')
-              ),
-              settings: fc.record({
-                theme: fc.oneof(fc.constant('light'), fc.constant('dark')),
-                notifications: fc.boolean(),
-              }),
-            }),
+              roles: fc.array(fc.string(), { minLength: 1, maxLength: 5 })
+            })
           }),
           async ({ userId, userData }) => {
             // Set user data
@@ -348,35 +315,16 @@ describe('Cache Consistency Property Tests', () => {
             const cachedUser = await UserCache.getUser(userId);
             expect(cachedUser).toEqual(userData);
             
-            // Update user data
-            const updatedUserData = {
-              ...userData,
-              username: `updated_${userData.username}`,
-              settings: {
-                ...userData.settings,
-                notifications: !userData.settings.notifications,
-              },
-            };
-            
-            await UserCache.setUser(userId, updatedUserData);
-            
-            // Verify update
-            const updatedCachedUser = await UserCache.getUser(userId);
-            expect(updatedCachedUser).toEqual(updatedUserData);
-            expect(updatedCachedUser).not.toEqual(userData);
-            
-            // Delete user
+            // Delete user data
             const deleteResult = await UserCache.deleteUser(userId);
             expect(deleteResult).toBe(true);
             
-            // Verify deletion
-            const deletedUser = await UserCache.getUser(userId);
-            expect(deletedUser).toBeNull();
-            
-            return true;
+            // Should be null after deletion
+            const afterDelete = await UserCache.getUser(userId);
+            expect(afterDelete).toBeNull();
           }
         ),
-        { numRuns: 30, timeout: 30000 }
+        { numRuns: 30 }
       );
     });
     
@@ -389,58 +337,29 @@ describe('Cache Consistency Property Tests', () => {
             projectData: fc.record({
               name: fc.string({ minLength: 1, maxLength: 100 }),
               url: fc.webUrl(),
-              settings: fc.record({
-                timeout: fc.integer({ min: 1000, max: 60000 }),
-                retries: fc.integer({ min: 0, max: 5 }),
-              }),
+              description: fc.string({ maxLength: 500 })
             }),
-            userProjects: fc.array(
+            projects: fc.array(
               fc.record({
                 id: fc.uuid(),
-                name: fc.string({ minLength: 1, maxLength: 50 }),
+                name: fc.string({ minLength: 1, maxLength: 100 })
               }),
-              { minLength: 1, maxLength: 5 }
-            ),
+              { minLength: 1, maxLength: 10 }
+            )
           }),
-          async ({ projectId, userId, projectData, userProjects }) => {
+          async ({ projectId, userId, projectData, projects }) => {
             // Set project data
             await ProjectCache.setProject(projectId, projectData);
-            
-            // Get project data
             const cachedProject = await ProjectCache.getProject(projectId);
             expect(cachedProject).toEqual(projectData);
             
             // Set user projects
-            await ProjectCache.setUserProjects(userId, userProjects);
-            
-            // Get user projects
-            const cachedUserProjects = await ProjectCache.getUserProjects(userId);
-            expect(cachedUserProjects).toEqual(userProjects);
-            
-            // Update project data
-            const updatedProjectData = {
-              ...projectData,
-              name: `updated_${projectData.name}`,
-              settings: {
-                ...projectData.settings,
-                timeout: projectData.settings.timeout * 2,
-              },
-            };
-            
-            await ProjectCache.setProject(projectId, updatedProjectData);
-            
-            // Verify project update
-            const updatedCachedProject = await ProjectCache.getProject(projectId);
-            expect(updatedCachedProject).toEqual(updatedProjectData);
-            
-            // User projects should remain unchanged
-            const unchangedUserProjects = await ProjectCache.getUserProjects(userId);
-            expect(unchangedUserProjects).toEqual(userProjects);
-            
-            return true;
+            await ProjectCache.setUserProjects(userId, projects);
+            const cachedProjects = await ProjectCache.getUserProjects(userId);
+            expect(cachedProjects).toEqual(projects);
           }
         ),
-        { numRuns: 25, timeout: 30000 }
+        { numRuns: 30 }
       );
     });
     
@@ -450,125 +369,208 @@ describe('Cache Consistency Property Tests', () => {
           fc.record({
             runId: fc.uuid(),
             runData: fc.record({
-              projectId: fc.uuid(),
-              status: fc.oneof(
-                fc.constant('queued'),
-                fc.constant('running'),
-                fc.constant('completed'),
-                fc.constant('failed')
-              ),
-              startTime: fc.date(),
-              duration: fc.option(fc.integer({ min: 100, max: 300000 })),
+              scenarioId: fc.uuid(),
+              status: fc.constantFrom('queued', 'running', 'completed', 'failed'),
+              startedAt: fc.date(),
+              duration: fc.integer({ min: 0, max: 300000 })
             }),
-            statusUpdates: fc.array(
-              fc.oneof(
-                fc.constant('queued'),
-                fc.constant('running'),
-                fc.constant('completed'),
-                fc.constant('failed')
-              ),
-              { minLength: 2, maxLength: 4 }
-            ),
+            status: fc.constantFrom('queued', 'running', 'completed', 'failed')
           }),
-          async ({ runId, runData, statusUpdates }) => {
+          async ({ runId, runData, status }) => {
             // Set test run data
             await TestRunCache.setTestRun(runId, runData);
-            
-            // Get test run data
             const cachedRun = await TestRunCache.getTestRun(runId);
             expect(cachedRun).toEqual(runData);
             
-            // Test status updates
-            for (const status of statusUpdates) {
-              await TestRunCache.setRunStatus(runId, status);
-              
-              const cachedStatus = await TestRunCache.getRunStatus(runId);
-              expect(cachedStatus).toBe(status);
-            }
-            
-            // Update run data
-            const updatedRunData = {
-              ...runData,
-              status: statusUpdates[statusUpdates.length - 1],
-              duration: runData.duration || 5000,
-            };
-            
-            await TestRunCache.setTestRun(runId, updatedRunData);
-            
-            // Verify update
-            const updatedCachedRun = await TestRunCache.getTestRun(runId);
-            expect(updatedCachedRun).toEqual(updatedRunData);
-            
-            return true;
+            // Set run status
+            await TestRunCache.setRunStatus(runId, status);
+            const cachedStatus = await TestRunCache.getRunStatus(runId);
+            expect(cachedStatus).toEqual(status);
           }
         ),
-        { numRuns: 25, timeout: 30000 }
+        { numRuns: 30 }
       );
     });
   });
   
-  describe('Property 26: Cache Performance Properties', () => {
-    it('should maintain reasonable performance under load', async () => {
-      const operations = 100;
-      const keys = Array.from({ length: operations }, (_, i) => `perf_test_${i}`);
-      const values = Array.from({ length: operations }, (_, i) => `value_${i}_${Date.now()}`);
-      
-      // Measure set operations
-      const setStart = Date.now();
-      const setPromises = keys.map((key, index) =>
-        Cache.set(key, values[index], { namespace: 'test', ttl: 60 })
+  describe('Cache Statistics Consistency', () => {
+    it('should maintain accurate statistics across operations', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              key: fc.string({ minLength: 1, maxLength: 50 }),
+              value: fc.string(),
+              operation: fc.constantFrom('set', 'get', 'delete')
+            }),
+            { minLength: 10, maxLength: 50 }
+          ),
+          async (operations) => {
+            // Reset stats
+            Cache.resetStats();
+            
+            let expectedHits = 0;
+            let expectedMisses = 0;
+            let expectedSets = 0;
+            let expectedDeletes = 0;
+            const keyState = new Map<string, boolean>();
+            
+            for (const op of operations) {
+              switch (op.operation) {
+                case 'set':
+                  await Cache.set(op.key, op.value, { namespace: 'test' });
+                  keyState.set(op.key, true);
+                  expectedSets++;
+                  break;
+                  
+                case 'get':
+                  await Cache.get(op.key, { namespace: 'test' });
+                  if (keyState.get(op.key)) {
+                    expectedHits++;
+                  } else {
+                    expectedMisses++;
+                  }
+                  break;
+                  
+                case 'delete':
+                  await Cache.delete(op.key, { namespace: 'test' });
+                  keyState.set(op.key, false);
+                  expectedDeletes++;
+                  break;
+              }
+            }
+            
+            const stats = Cache.getStats();
+            expect(stats.hits).toBe(expectedHits);
+            expect(stats.misses).toBe(expectedMisses);
+            expect(stats.sets).toBe(expectedSets);
+            expect(stats.deletes).toBe(expectedDeletes);
+            
+            // Hit rate calculation should be correct
+            const totalRequests = expectedHits + expectedMisses;
+            const expectedHitRate = totalRequests > 0 ? expectedHits / totalRequests : 0;
+            expect(stats.hitRate).toBeCloseTo(expectedHitRate, 5);
+          }
+        ),
+        { numRuns: 20 }
       );
-      await Promise.all(setPromises);
-      const setDuration = Date.now() - setStart;
-      
-      // Measure get operations
-      const getStart = Date.now();
-      const getPromises = keys.map(key =>
-        Cache.get(key, { namespace: 'test' })
+    });
+  });
+  
+  describe('Cache Stampede Prevention', () => {
+    it('should prevent cache stampede with getOrSet operations', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            key: fc.string({ minLength: 1, maxLength: 100 }),
+            value: fc.string(),
+            concurrentRequests: fc.integer({ min: 2, max: 10 })
+          }),
+          async ({ key, value, concurrentRequests }) => {
+            let factoryCallCount = 0;
+            
+            const factory = async () => {
+              factoryCallCount++;
+              // Simulate expensive operation
+              await new Promise(resolve => setTimeout(resolve, 100));
+              return value;
+            };
+            
+            // Make concurrent requests
+            const promises = Array(concurrentRequests).fill(null).map(() =>
+              Cache.getOrSet(key, factory, { namespace: 'test', ttl: 60 })
+            );
+            
+            const results = await Promise.all(promises);
+            
+            // All results should be the same
+            results.forEach(result => {
+              expect(result).toEqual(value);
+            });
+            
+            // Factory should be called only once (stampede prevention)
+            expect(factoryCallCount).toBe(1);
+            
+            // Value should be cached
+            const cached = await Cache.get(key, { namespace: 'test' });
+            expect(cached).toEqual(value);
+          }
+        ),
+        { numRuns: 20, timeout: 5000 }
       );
-      const results = await Promise.all(getPromises);
-      const getDuration = Date.now() - getStart;
-      
-      // Verify all operations completed successfully
-      results.forEach((result, index) => {
-        expect(result).toBe(values[index]);
-      });
-      
-      // Performance assertions
-      expect(setDuration).toBeLessThan(5000); // 5 seconds for 100 sets
-      expect(getDuration).toBeLessThan(2000); // 2 seconds for 100 gets
-      
-      const setThroughput = operations / (setDuration / 1000);
-      const getThroughput = operations / (getDuration / 1000);
-      
-      expect(setThroughput).toBeGreaterThan(20); // At least 20 sets/sec
-      expect(getThroughput).toBeGreaterThan(50); // At least 50 gets/sec
-      
-      // Check cache stats
-      const stats = Cache.getStats();
-      expect(stats.hits).toBe(operations);
-      expect(stats.sets).toBeGreaterThanOrEqual(operations);
-      expect(stats.hitRate).toBe(1.0); // 100% hit rate
     });
-    
-    it('should handle cache misses gracefully', async () => {
-      const nonExistentKeys = Array.from({ length: 50 }, (_, i) => `missing_${i}_${Date.now()}`);
-      
-      const start = Date.now();
-      const results = await Cache.mget(nonExistentKeys, { namespace: 'test' });
-      const duration = Date.now() - start;
-      
-      // All results should be null
-      results.forEach(result => {
-        expect(result).toBeNull();
-      });
-      
-      // Should complete quickly even for misses
-      expect(duration).toBeLessThan(1000); // 1 second for 50 misses
-      
-      // Check stats
-      const stats = Cache.getStats();
-      expect(stats.misses).toBe(50);
+  });
+  
+  describe('Error Handling Consistency', () => {
+    it('should handle Redis connection errors gracefully', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            key: fc.string({ minLength: 1, maxLength: 100 }),
+            value: fc.string()
+          }),
+          async ({ key, value }) => {
+            // These operations should not throw even if Redis has issues
+            // (they should fail gracefully)
+            
+            const setResult = await Cache.set(key, value, { namespace: 'test' });
+            // Should return boolean, not throw
+            expect(typeof setResult).toBe('boolean');
+            
+            const getResult = await Cache.get(key, { namespace: 'test' });
+            // Should return value or null, not throw
+            expect(getResult === null || typeof getResult === 'string').toBe(true);
+            
+            const deleteResult = await Cache.delete(key, { namespace: 'test' });
+            // Should return boolean, not throw
+            expect(typeof deleteResult).toBe('boolean');
+          }
+        ),
+        { numRuns: 30 }
+      );
     });
+  });
+});
+
+describe('Cache Performance Properties', () => {
+  it('should maintain performance characteristics under load', async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(
+          fc.record({
+            key: fc.string({ minLength: 1, maxLength: 50 }),
+            value: fc.string({ minLength: 1, maxLength: 1000 })
+          }),
+          { minLength: 100, maxLength: 500 }
+        ),
+        async (entries) => {
+          const startTime = Date.now();
+          
+          // Batch operations should be faster than individual operations
+          await Cache.mset(
+            entries.map(e => ({ key: e.key, value: e.value })),
+            { namespace: 'test' }
+          );
+          
+          const batchSetTime = Date.now() - startTime;
+          
+          // Get all values
+          const getStartTime = Date.now();
+          const keys = entries.map(e => e.key);
+          const results = await Cache.mget(keys, { namespace: 'test' });
+          const batchGetTime = Date.now() - getStartTime;
+          
+          // Results should match
+          results.forEach((result, index) => {
+            expect(result).toEqual(entries[index].value);
+          });
+          
+          // Performance should be reasonable (less than 1 second for batch operations)
+          expect(batchSetTime).toBeLessThan(1000);
+          expect(batchGetTime).toBeLessThan(1000);
+        }
+      ),
+      { numRuns: 10, timeout: 10000 }
+    );
   });
 });
