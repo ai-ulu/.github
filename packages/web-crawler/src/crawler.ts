@@ -36,7 +36,7 @@ export class WebCrawler {
       ...config
     };
     
-    this.concurrencyLimit = pLimit(this.config.concurrency);
+    this.concurrencyLimit = pLimit(this.config.concurrency || 5);
   }
 
   async initialize(): Promise<void> {
@@ -47,7 +47,7 @@ export class WebCrawler {
       });
 
       this.context = await this.browser.newContext({
-        userAgent: this.config.userAgent,
+        userAgent: this.config.userAgent || 'AutoQA-Crawler/1.0',
         viewport: { width: 1920, height: 1080 },
         ignoreHTTPSErrors: true
       });
@@ -112,7 +112,7 @@ export class WebCrawler {
   private async processCrawlQueue(): Promise<void> {
     const promises: Promise<void>[] = [];
 
-    while (this.crawlQueue.length > 0 && this.visitedUrls.size < this.config.maxPages) {
+    while (this.crawlQueue.length > 0 && this.visitedUrls.size < (this.config.maxPages || 100)) {
       const url = this.crawlQueue.shift();
       if (!url || this.visitedUrls.has(url)) continue;
 
@@ -121,8 +121,8 @@ export class WebCrawler {
           await this.crawlPage(url);
           
           // Add delay between requests
-          if (this.config.delay > 0) {
-            await new Promise(resolve => setTimeout(resolve, this.config.delay));
+          if ((this.config.delay || 0) > 0) {
+            await new Promise(resolve => setTimeout(resolve, this.config.delay || 1000));
           }
         })
       );
@@ -132,7 +132,7 @@ export class WebCrawler {
   }
 
   private async crawlPage(url: string): Promise<void> {
-    if (this.visitedUrls.has(url) || this.visitedUrls.size >= this.config.maxPages) {
+    if (this.visitedUrls.has(url) || this.visitedUrls.size >= (this.config.maxPages || 100)) {
       return;
     }
 
@@ -182,7 +182,7 @@ export class WebCrawler {
       // Navigate to page
       const response = await page.goto(url, {
         waitUntil: 'domcontentloaded',
-        timeout: this.config.timeout
+        timeout: this.config.timeout || 30000
       });
 
       if (!response) {
@@ -209,7 +209,7 @@ export class WebCrawler {
 
       // Find and queue new links
       const depth = this.getUrlDepth(url);
-      if (depth < this.config.maxDepth) {
+      if (depth < (this.config.maxDepth || 3)) {
         await this.extractAndQueueLinks(page, url);
       }
 
@@ -355,7 +355,7 @@ export class WebCrawler {
           const robots = robotsParser(robotsUrl, robotsContent);
           this.robotsCache.set(robotsUrl, robots);
           
-          return robots.isAllowed(url, this.config.userAgent);
+          return robots.isAllowed(url, this.config.userAgent || '*') || false;
         }
       } finally {
         await page.close();
