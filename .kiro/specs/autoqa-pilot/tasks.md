@@ -217,7 +217,7 @@ This implementation plan breaks down the AutoQA Pilot system into incremental de
     - _Requirements: 2.1, 2.2, 2.5_
 
 - [ ] 9. Create test scenario management UI
-  - [ ] 9.1 Implement test scenario editor
+  - [x] 9.1 Implement test scenario editor
     - Create drag-and-drop interface for test steps
     - Add natural language input with real-time preview
     - Implement code editing with syntax highlighting
@@ -234,7 +234,7 @@ This implementation plan breaks down the AutoQA Pilot system into incremental de
 ### Phase 5: Autonomous Web Crawler
 
 - [ ] 10. Implement autonomous crawler service
-  - [ ] 10.1 Create web crawler with Playwright
+  - [x] 10.1 Create web crawler with Playwright
     - Implement site scanning with robots.txt compliance
     - Add concurrent request limiting (max 5 per domain)
     - Create sitemap generation and broken link detection
