@@ -263,27 +263,27 @@ This implementation plan breaks down the AutoQA Pilot system into incremental de
 ### Phase 6: Self-Healing Engine
 
 - [ ] 11. Implement self-healing test engine
-  - [ ] 11.1 Create element location strategies
+  - [x] 11.1 Create element location strategies
     - Implement CSS selector alternatives (ID, class, attribute)
     - Add XPath fallback mechanisms
     - Create text content matching algorithms
     - Implement visual element recognition with OpenCV
     - _Requirements: 4.1, 4.2, 4.5_
 
-  - [ ] 11.2 Create healing event logging and notification
+  - [x] 11.2 Create healing event logging and notification
     - Implement detailed logging of healing attempts
     - Add user notification system for healing events
     - Create rollback capability for failed healing
     - Add DOM snapshot capture for debugging
     - _Requirements: 4.3, 4.4_
 
-  - [ ]* 11.3 Write property tests for self-healing
+  - [x]* 11.3 Write property tests for self-healing
     - **Property 7: Element Location Healing**
     - **Validates: Requirements 4.1, 4.2**
     - Test that healing attempts alternative location strategies
     - Verify test scenarios are updated when healing succeeds
 
-  - [ ]* 11.4 Write property tests for healing event logging
+  - [-]* 11.4 Write property tests for healing event logging
     - **Property 8: Healing Event Logging**
     - **Validates: Requirements 4.3, 4.4, 4.5**
     - Test that all healing attempts are logged appropriately
