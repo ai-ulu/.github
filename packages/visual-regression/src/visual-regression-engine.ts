@@ -205,7 +205,7 @@ export class VisualRegressionEngine {
       filePath: baselineFilePath,
       metadata: {
         ...metadata,
-        selector: options.selector,
+        selector: options.selector || undefined,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -350,7 +350,7 @@ export class VisualRegressionEngine {
         pixelDifference,
         percentageDifference,
         threshold,
-        diffImagePath,
+        diffImagePath: diffImagePath || undefined,
         actualImagePath,
         baselineImagePath,
         metadata: {

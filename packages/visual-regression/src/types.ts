@@ -22,7 +22,7 @@ export interface BaselineImage {
     viewport: { width: number; height: number };
     browser: string;
     url: string;
-    selector?: string;
+    selector?: string | undefined;
     createdAt: Date;
     updatedAt: Date;
   };
@@ -37,7 +37,7 @@ export interface ComparisonResult {
   pixelDifference: number;
   percentageDifference: number;
   threshold: number;
-  diffImagePath?: string;
+  diffImagePath?: string | undefined;
   actualImagePath: string;
   baselineImagePath?: string;
   metadata: {
