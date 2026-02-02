@@ -16,6 +16,7 @@ import { rateLimiter } from './middleware/rate-limiter';
 // Import routes
 import usersRouter from './routes/users';
 import projectsRouter from './routes/projects';
+import webhooksRouter from './routes/webhooks';
 
 // Load environment variables
 dotenv.config();
@@ -112,6 +113,7 @@ app.get('/health', (req: any, res) => {
 // API routes
 app.use('/api/users', usersRouter);
 app.use('/api/projects', projectsRouter);
+app.use('/api/webhooks', webhooksRouter);
 
 // 404 handler
 app.use('*', (req: any, res) => {
