@@ -30,6 +30,7 @@ module.exports = {
   },
   
   // Setup files
+  setupFiles: ['<rootDir>/tests/setup.js'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   
   // Coverage configuration
@@ -82,23 +83,41 @@ module.exports = {
   globalSetup: '<rootDir>/jest.global-setup.js',
   globalTeardown: '<rootDir>/jest.global-teardown.js',
   
+  // Test environment options to fix localStorage issue
+  testEnvironmentOptions: {
+    url: 'http://localhost',
+    userAgent: 'node.js'
+  },
+  
   // Test projects for different test types
   projects: [
     {
       displayName: 'unit',
       testMatch: ['**/*.unit.(test|spec).(ts|tsx)'],
-      testEnvironment: 'node'
+      testEnvironment: 'node',
+      testEnvironmentOptions: {
+        url: 'http://localhost',
+        userAgent: 'node.js'
+      }
     },
     {
       displayName: 'property',
       testMatch: ['**/*.property.(test|spec).(ts|tsx)'],
       testEnvironment: 'node',
+      testEnvironmentOptions: {
+        url: 'http://localhost',
+        userAgent: 'node.js'
+      },
       testTimeout: 60000 // Property tests may take longer
     },
     {
       displayName: 'integration',
       testMatch: ['**/*.integration.(test|spec).(ts|tsx)'],
       testEnvironment: 'node',
+      testEnvironmentOptions: {
+        url: 'http://localhost',
+        userAgent: 'node.js'
+      },
       testTimeout: 120000 // Integration tests may take longer
     }
   ],
