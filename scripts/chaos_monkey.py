@@ -1,45 +1,50 @@
 import os
-import requests
+import json
 import random
 import base64
+import urllib.request
 
 TOKEN = os.environ.get("GITHUB_TOKEN")
 ORG = "ai-ulu"
-headers = {"Authorization": f"token {TOKEN}", "Accept": "application/vnd.github.v3+json"}
+
+def github_request(url, method="GET", data=None):
+    headers = {"Authorization": f"token {TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    req = urllib.request.Request(url, headers=headers, method=method)
+    if data:
+        req.add_header("Content-Type", "application/json")
+        data = json.dumps(data).encode()
+    try:
+        with urllib.request.urlopen(req, data=data) as res:
+            return json.loads(res.read().decode()), res.status
+    except Exception as e:
+        print(f"Error: {e}")
+        return None, 0
 
 def inject_chaos():
-    # 1. Get repos
-    repos_res = requests.get(f"https://api.github.com/orgs/{ORG}/repos", headers=headers)
-    repos = [r["name"] for r in repos_res.json() if r["name"] not in [".github", "ai-ulu.github.io", "QA"]]
-    
+    repos, status = github_request(f"https://api.github.com/orgs/{ORG}/repos?per_page=100")
     if not repos: return
     
-    target_repo = random.choice(repos)
+    eligible = [r["name"] for r in repos if r["name"] not in [".github", "ai-ulu.github.io", "QA"]]
+    target_repo = random.choice(eligible)
     print(f"🐒 Chaos Monkey is attacking: {target_repo}")
     
-    # 2. Inject a "failing test" file
-    chaos_content = "test('chaos failure', () => { expect(true).toBe(false); });"
-    b64_content = base64.b64encode(chaos_content.encode()).decode()
-    
     path = "tests/chaos_test.js"
+    content = "test('chaos failure', () => { throw new Error('Chaos Injected!'); });"
+    b64_content = base64.b64encode(content.encode()).decode()
+    
     url = f"https://api.github.com/repos/{ORG}/{target_repo}/contents/{path}"
+    data = {"message": "🔥 Chaos Monkey injection", "content": b64_content, "branch": "main"}
     
-    data = {
-        "message": "🔥 Chaos Monkey: Injected failure for resilience testing",
-        "content": b64_content,
-        "branch": "main" # Directly to main for maximum chaos in this simulation
-    }
-    
-    # First check if exists to get SHA if updating (though we expect new)
-    res = requests.get(url, headers=headers)
-    if res.status_code == 200:
-        data["sha"] = res.json()["sha"]
-    
-    put_res = requests.put(url, headers=headers, json=data)
-    if put_res.status_code in [200, 201]:
-        print(f"✅ Chaos injected into {target_repo} at {path}")
+    # Check if exists
+    existing, _ = github_request(url)
+    if existing and "sha" in existing:
+        data["sha"] = existing["sha"]
+        
+    _, status = github_request(url, method="PUT", data=data)
+    if status in [200, 201]:
+        print(f"✅ Chaos injected into {target_repo}")
     else:
-        print(f"❌ Failed to inject chaos: {put_res.text}")
+        print(f"❌ Failed to inject chaos")
 
 if __name__ == "__main__":
     inject_chaos()
