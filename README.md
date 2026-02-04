@@ -201,4 +201,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for QA Engineers worldwide**
+**Built with ❤️ for QA Engineers worldwide**\n<!-- Trigger CI -->
