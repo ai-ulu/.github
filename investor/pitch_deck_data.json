@@ -1,0 +1,12 @@
+{
+  "company_name": "ai-ulu",
+  "vision": "Autonomous Agentic Engineering",
+  "metrics": {
+    "aor": 92.5,
+    "rsi": 98.4,
+    "mttr": "4.2m",
+    "active_repos": 30,
+    "valuation_multiplier": "1.5x (Automation Premium)"
+  },
+  "last_sync": "2026-02-04T11:42:03.883290"
+}
