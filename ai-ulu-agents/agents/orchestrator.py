@@ -1,9 +1,13 @@
 import time
 from typing import Optional
 
+import json
+import os
+
 from .core.base_agent import BaseAgent
 from .core.memory import AgentMemory
 from .core.task_queue import TaskQueue
+from .core.registry import AgentRegistry
 from .repair_agent import RepairAgent
 from .self_healing_agent import SelfHealingAgent
 
@@ -17,27 +21,56 @@ class Orchestrator(BaseAgent):
     ):
         super().__init__(name="Orchestrator", memory=memory)
         self.queue = queue or TaskQueue()
+        self.registry = AgentRegistry()
         self.poll_seconds = poll_seconds
+
+    def _is_allowed(self, target: str) -> bool:
+        allowlist_path = os.path.join("war-room", "data", "allowlist.json")
+        if not os.path.exists(allowlist_path):
+            return True
+        try:
+            with open(allowlist_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return False
+        allowed = data.get("repos", [])
+        if not allowed:
+            return True
+        return target in allowed
 
     def dispatch(self, task):
         task_type = (task.get("type") or "").upper()
         task_id = task.get("id", "")
+        target = task.get("target", "unknown")
+        agent_cfg = self.registry.get_agent_config_for_task(task_type)
+        agent_id = agent_cfg.get("agent_id", "unknown")
+        cooldown = int(agent_cfg.get("cooldown_seconds", 0))
+        if not self.memory.can_run(agent_id, cooldown):
+            self.log_activity(f"Cooldown active for {agent_id}", icon="[WAIT]", task_id=task_id)
+            return "cooldown"
         if task_type == "REPAIR":
+            if not self._is_allowed(target):
+                self.log_activity(f"Blocked by allowlist: {target}", icon="[BLOCK]", task_id=task_id)
+                self.memory.record_agent_result(agent_id, False)
+                return "blocked"
             agent = RepairAgent(memory=self.memory)
-            target = task.get("target", "unknown")
             agent.report_dependency_issue(target, "queued repair")
             self.log_activity(f"Dispatched repair to {target}", icon="[REPAIR]", task_id=task_id)
+            self.memory.record_agent_result(agent_id, True)
             return "repair_dispatched"
         if task_type == "SELF_HEAL":
             agent = SelfHealingAgent(memory=self.memory)
             metrics = self.memory.get_sync_metrics()
             if not metrics.get("panic_status"):
                 self.log_activity("Self-heal skipped (no panic)", icon="[HEAL]", task_id=task_id)
+                self.memory.record_agent_result(agent_id, True)
                 return "self_heal_skipped"
             agent.check_system_health()
             self.log_activity("Dispatched self-heal", icon="[HEAL]", task_id=task_id)
+            self.memory.record_agent_result(agent_id, True)
             return "self_heal_dispatched"
         self.log_activity(f"Unknown task type: {task_type}", icon="[WARN]")
+        self.memory.record_agent_result(agent_id, False)
         return "unknown_task"
 
     def run_once(self) -> None:

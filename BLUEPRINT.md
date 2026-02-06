@@ -50,11 +50,11 @@ and aligned with the current repo layout.
 - Task queue + orchestrator loop.
 - Priority sorting and queue visualization.
 
-### Phase 4: Recovery Automation (Next)
+### Phase 4: Recovery Automation (Done)
 - Health checks auto-enqueue `SELF_HEAL` on panic.
 - Optional daemon runner on server.
 
-### Phase 5: Multi-Agent Coordination (Planned)
+### Phase 5: Multi-Agent Coordination (In Progress)
 - Agent capabilities registry.
 - Load-aware dispatch (cooldown / success rate).
 - Multi-repo routing and allowlist policies.

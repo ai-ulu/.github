@@ -1,0 +1,12 @@
+{
+  "agents": {
+    "repair_agent": {
+      "cooldown_seconds": 10,
+      "capabilities": ["REPAIR"]
+    },
+    "self_healing_agent": {
+      "cooldown_seconds": 5,
+      "capabilities": ["SELF_HEAL"]
+    }
+  }
+}

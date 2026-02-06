@@ -24,6 +24,7 @@ class AgentMemory:
                             "ops_window": [],
                             "panic_count": 0,
                             "panic_resolved": 0,
+                            "agent_stats": {},
                         },
                         "panic_status": False,
                         "panic_reason": None,
@@ -148,7 +149,35 @@ class AgentMemory:
             "panic_status": data.get("panic_status", False),
             "panic_reason": data.get("panic_reason"),
             "panic_at": data.get("panic_at"),
+            "agent_stats": stats.get("agent_stats", {}),
         }
+
+    def can_run(self, agent_id: str, cooldown_seconds: int) -> bool:
+        data = self._read()
+        stats = data.get("stats", {})
+        agent_stats = stats.get("agent_stats", {})
+        entry = agent_stats.get(agent_id, {})
+        last_run = entry.get("last_run")
+        if not last_run:
+            return True
+        try:
+            last_dt = datetime.fromisoformat(last_run.replace("Z", "+00:00"))
+        except ValueError:
+            return True
+        delta = datetime.utcnow() - last_dt.replace(tzinfo=None)
+        return delta.total_seconds() >= cooldown_seconds
+
+    def record_agent_result(self, agent_id: str, success: bool) -> None:
+        data = self._read()
+        stats = data.setdefault("stats", {})
+        agent_stats = stats.setdefault("agent_stats", {})
+        entry = agent_stats.setdefault(agent_id, {"success": 0, "failure": 0, "last_run": None})
+        if success:
+            entry["success"] = int(entry.get("success", 0)) + 1
+        else:
+            entry["failure"] = int(entry.get("failure", 0)) + 1
+        entry["last_run"] = datetime.utcnow().isoformat() + "Z"
+        self._write(data)
 
     def get_dashboard_stats(self) -> Dict[str, Any]:
         data = self._read()
