@@ -8,6 +8,7 @@ class WarRoomDashboard {
         this.reposUrl = 'data/repos.json';
         this.memoryUrl = 'data/agent_memory.json';
         this.queueUrl = 'data/task_queue.json';
+        this.classifyUrl = 'data/classify_queue.json';
         this.updateInterval = 30000; // 30 seconds
         this.translations = {
             en: {
@@ -36,7 +37,9 @@ class WarRoomDashboard {
                 footer_line: '(c) 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem',
                 footer_tagline: '"Not a framework. Not a platform. An Operating System for AI."',
                 queue_empty: 'empty',
-                repos_meta: 'Total {total} (Public {public}, Private {private})'
+                repos_meta: 'Total {total} (Public {public}, Private {private})',
+                classify_title: 'Classification Proposals',
+                classify_empty: 'none'
             },
             tr: {
                 tagline: 'Otonom Ajan Mühendisligi - Canli Misyon Kontrol',
@@ -64,7 +67,9 @@ class WarRoomDashboard {
                 footer_line: '(c) 2026 ai-ulu | Otonom Ajan Muhendisligi Ekosistemi',
                 footer_tagline: '"Bir framework degil. Bir platform degil. AI icin bir Isletim Sistemi."',
                 queue_empty: 'bos',
-                repos_meta: 'Toplam {total} (Acik {public}, Gizli {private})'
+                repos_meta: 'Toplam {total} (Acik {public}, Gizli {private})',
+                classify_title: 'Siniflandirma Onerileri',
+                classify_empty: 'yok'
             }
         };
         this.lang = this.getDefaultLanguage();
@@ -83,6 +88,7 @@ class WarRoomDashboard {
         await this.loadRepositories();
         await this.checkPanic();
         await this.loadQueueStatus();
+        await this.loadClassifyStatus();
 
         // Set up auto-refresh
         setInterval(() => this.loadMetrics(), this.updateInterval);
@@ -90,6 +96,7 @@ class WarRoomDashboard {
         setInterval(() => this.loadRepositories(), this.updateInterval * 4); // Repos update less frequently
         setInterval(() => this.checkPanic(), this.updateInterval);
         setInterval(() => this.loadQueueStatus(), this.updateInterval);
+        setInterval(() => this.loadClassifyStatus(), this.updateInterval);
 
         console.log('OK War Room Dashboard ready');
     }
@@ -404,6 +411,30 @@ class WarRoomDashboard {
                 .replace('{pending}', '--')
                 .replace('{active}', '--');
             if (listEl) listEl.innerHTML = '<li>--</li>';
+        }
+    }
+
+    async loadClassifyStatus() {
+        const listEl = document.getElementById('classify-list');
+        if (!listEl) return;
+        const dict = this.translations[this.lang] || this.translations.en;
+        try {
+            const response = await fetch(this.classifyUrl);
+            if (!response.ok) {
+                listEl.innerHTML = '<li>--</li>';
+                return;
+            }
+            const data = await response.json();
+            const pending = (data.pending || []).slice(0, 3);
+            if (!pending.length) {
+                listEl.innerHTML = `<li>${dict.classify_empty}</li>`;
+                return;
+            }
+            listEl.innerHTML = pending
+                .map((item) => `<li>${item.repo} -> ${item.suggested_class}</li>`)
+                .join('');
+        } catch (error) {
+            listEl.innerHTML = '<li>--</li>';
         }
     }
 

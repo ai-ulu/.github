@@ -13,6 +13,7 @@ from .repair_agent import RepairAgent
 from .self_healing_agent import SelfHealingAgent
 from .chaos_monkey import ChaosMonkey
 from .watcher import Watcher
+from .auto_classifier import AutoClassifier
 
 
 class Orchestrator(BaseAgent):
@@ -164,6 +165,12 @@ class Orchestrator(BaseAgent):
             )
             self.memory.record_agent_result(agent_id, True)
             return "watch_dispatched"
+        if task_type == "CLASSIFY":
+            agent = AutoClassifier(memory=self.memory)
+            proposals = agent.scan_and_propose()
+            self.log_activity(f"Auto-classifier proposed {proposals} changes", icon="[CLASSIFY]", task_id=task_id)
+            self.memory.record_agent_result(agent_id, True)
+            return "classify_dispatched"
         if task_type == "SELF_HEAL":
             agent = SelfHealingAgent(memory=self.memory)
             metrics = self.memory.get_sync_metrics()
@@ -198,6 +205,16 @@ class Orchestrator(BaseAgent):
             if not snapshot.get("pending"):
                 for task in policy.get("idle_tasks", []):
                     self.queue.enqueue(task)
+        if policy.get("auto_classify", False) and not self.queue.has_task("CLASSIFY"):
+            self.queue.enqueue(
+                {
+                    "type": "CLASSIFY",
+                    "target": "policy",
+                    "priority": "low",
+                    "impact": "low",
+                    "category": "muscle",
+                }
+            )
         task = self._pick_next_task(policy, rsi)
         if task:
             task = self.queue.pop_by_id(task.get("id", ""))

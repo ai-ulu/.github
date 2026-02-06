@@ -15,6 +15,10 @@
     "watcher": {
       "cooldown_seconds": 60,
       "capabilities": ["WATCH"]
+    },
+    "auto_classifier": {
+      "cooldown_seconds": 300,
+      "capabilities": ["CLASSIFY"]
     }
   }
 }
