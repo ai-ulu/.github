@@ -5,9 +5,9 @@
   "rsi": 80.0,
   "mttr": 3.33,
   "active_repos": 0,
-  "last_chaos": "2026-02-06T12:45:59.704250Z",
-  "chaos_success": "0.0%",
+  "last_chaos": "none",
+  "chaos_success": "100.0%",
   "chaos_scenarios": 1,
   "valuation_multiplier": "1.5x (Automation Premium)",
-  "last_sync": "2026-02-06T15:46:41.052468"
+  "last_sync": "2026-02-06T15:52:50.900706"
 }

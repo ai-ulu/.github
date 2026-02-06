@@ -1,6 +1,11 @@
 {
   "activities": [
     {
+      "icon": "[+]",
+      "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
       "icon": "[WARN]",
       "text": "RepairAgent: RepairAgent: panic_test -> error: Simulated repair failure",
       "time": "Just now"
@@ -36,10 +41,10 @@
     ],
     "operations": 4,
     "panic_count": 1,
-    "panic_resolved": 0
+    "panic_resolved": 1
   },
-  "panic_status": true,
-  "panic_reason": "RepairAgent failed during panic_test: Simulated repair failure",
-  "panic_at": "2026-02-06T12:45:59.704250Z",
+  "panic_status": false,
+  "panic_reason": "System restored by SelfHealingAgent",
+  "panic_at": null,
   "last_repair_at": "2026-02-06T12:45:59.655487Z"
 }
