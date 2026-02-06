@@ -37,16 +37,35 @@ def calculate_aor(repos):
     
     return round((successful_workflows / total_workflows) * 100, 1)
 
-def calculate_rsi(repos):
-    """Calculate Resilience Stability Index"""
-    # Based on uptime, error recovery, and chaos test results
-    # Simplified for now
-    return 98.4
+def load_agent_memory():
+    """Load agent memory metrics from war-room/data/agent_memory.json"""
+    path = os.path.join("war-room", "data", "agent_memory.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-def calculate_mttr(repos):
-    """Calculate Mean Time To Repair"""
-    # Would analyze issue/PR resolution times in production
-    return 4.2
+def calculate_rsi_from_memory(memory):
+    """Calculate Resilience Stability Index from agent memory"""
+    stats = memory.get("stats", {})
+    operations = int(stats.get("operations", 0))
+    panic_count = int(stats.get("panic_count", 0))
+    total = operations + panic_count
+    if total == 0:
+        return 0.0
+    return round((operations / total) * 100, 2)
+
+def calculate_mttr_from_memory(memory):
+    """Calculate Mean Time To Repair from agent memory"""
+    stats = memory.get("stats", {})
+    repair_times = list(stats.get("repair_times", []))
+    if repair_times:
+        return round(sum(repair_times) / len(repair_times), 2)
+    repairs = int(stats.get("repairs", 0))
+    total_time = float(stats.get("total_time", 0.0))
+    if repairs == 0:
+        return 0.0
+    return round(total_time / repairs, 2)
 
 def get_active_repos_count(repos):
     """Count active public repositories (updated in last 30 days)"""
@@ -160,10 +179,16 @@ def main():
         
         print(f"Found Found {len(repos)} repositories")
         
+        # Load agent memory for live metrics
+        memory = load_agent_memory()
+        stats = memory.get("stats", {})
+        panic_count = int(stats.get("panic_count", 0))
+        panic_resolved = int(stats.get("panic_resolved", 0))
+
         # Calculate metrics
         aor = calculate_aor(repos)
-        rsi = calculate_rsi(repos)
-        mttr = calculate_mttr(repos)
+        rsi = calculate_rsi_from_memory(memory)
+        mttr = calculate_mttr_from_memory(memory)
         active_repos = get_active_repos_count(public_repos)
         
         # Update metrics.json
@@ -174,9 +199,9 @@ def main():
             'rsi': rsi,
             'mttr': mttr,
             'active_repos': active_repos,
-            'last_chaos': 'dependency_corruption (2 days ago)',
-            'chaos_success': '98.4%',
-            'chaos_scenarios': 24,
+            'last_chaos': memory.get("panic_at") or "none",
+            'chaos_success': f"{round((panic_resolved / panic_count) * 100, 2)}%" if panic_count > 0 else "0%",
+            'chaos_scenarios': panic_count,
             'valuation_multiplier': '1.5x (Automation Premium)',
             'last_sync': datetime.now().isoformat()
         }

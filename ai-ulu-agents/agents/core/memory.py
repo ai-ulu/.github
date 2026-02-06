@@ -16,7 +16,14 @@ class AgentMemory:
                 json.dump(
                     {
                         "activities": [],
-                        "stats": {"repairs": 0, "total_time": 0.0},
+                        "stats": {
+                            "repairs": 0,
+                            "total_time": 0.0,
+                            "repair_times": [],
+                            "operations": 0,
+                            "panic_count": 0,
+                            "panic_resolved": 0,
+                        },
                         "panic_status": False,
                         "panic_reason": None,
                         "panic_at": None,
@@ -37,6 +44,10 @@ class AgentMemory:
         icon = "[OK]" if result.lower() in {"ok", "success", "fixed"} else "[WARN]"
         text = f"{agent_name}: {action} -> {result}"
         self.record_activity(agent_name, text, icon=icon)
+        data = self._read()
+        stats = data.setdefault("stats", {})
+        stats["operations"] = int(stats.get("operations", 0)) + 1
+        self._write(data)
 
     def record_activity(self, agent_name: str, text: str, icon: str = "[#]") -> None:
         data = self._read()
@@ -55,6 +66,9 @@ class AgentMemory:
         data = self._read()
         stats = data.setdefault("stats", {})
         stats["repairs"] = int(stats.get("repairs", 0)) + 1
+        repair_times = list(stats.get("repair_times", []))
+        repair_times.append(float(duration_minutes))
+        stats["repair_times"] = repair_times[-100:]
         stats["total_time"] = float(stats.get("total_time", 0.0)) + float(
             duration_minutes
         )
@@ -63,9 +77,15 @@ class AgentMemory:
 
     def set_panic(self, status: bool, reason: str) -> None:
         data = self._read()
+        was_panic = bool(data.get("panic_status", False))
         data["panic_status"] = bool(status)
         data["panic_reason"] = reason
         data["panic_at"] = datetime.utcnow().isoformat() + "Z" if status else None
+        stats = data.setdefault("stats", {})
+        if status and not was_panic:
+            stats["panic_count"] = int(stats.get("panic_count", 0)) + 1
+        if not status and was_panic:
+            stats["panic_resolved"] = int(stats.get("panic_resolved", 0)) + 1
         if status:
             data["activities"].insert(
                 0,
@@ -77,6 +97,40 @@ class AgentMemory:
             )
             data["activities"] = data["activities"][:10]
         self._write(data)
+
+    def get_sync_metrics(self) -> Dict[str, Any]:
+        data = self._read()
+        stats = data.get("stats", {})
+        repairs = int(stats.get("repairs", 0))
+        total_time = float(stats.get("total_time", 0.0))
+        repair_times = list(stats.get("repair_times", []))
+        operations = int(stats.get("operations", 0))
+        panic_count = int(stats.get("panic_count", 0))
+        panic_resolved = int(stats.get("panic_resolved", 0))
+        mttr = (
+            round(sum(repair_times) / len(repair_times), 2)
+            if repair_times
+            else round((total_time / repairs), 2)
+            if repairs > 0
+            else 0.0
+        )
+        rsi = (
+            round((operations / (operations + panic_count)) * 100, 2)
+            if operations + panic_count > 0
+            else 0.0
+        )
+        return {
+            "repairs": repairs,
+            "total_time": total_time,
+            "mttr": mttr,
+            "rsi": rsi,
+            "operations": operations,
+            "panic_count": panic_count,
+            "panic_resolved": panic_resolved,
+            "panic_status": data.get("panic_status", False),
+            "panic_reason": data.get("panic_reason"),
+            "panic_at": data.get("panic_at"),
+        }
 
     def get_dashboard_stats(self) -> Dict[str, Any]:
         data = self._read()

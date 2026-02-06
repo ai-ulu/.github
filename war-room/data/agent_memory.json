@@ -2,7 +2,11 @@
   "activities": [],
   "stats": {
     "repairs": 0,
-    "total_time": 0.0
+    "total_time": 0.0,
+    "repair_times": [],
+    "operations": 0,
+    "panic_count": 0,
+    "panic_resolved": 0
   },
   "panic_status": false,
   "panic_reason": null,

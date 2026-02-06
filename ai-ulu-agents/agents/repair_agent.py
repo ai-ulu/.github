@@ -15,6 +15,9 @@ class RepairAgent(BaseAgent):
         self.memory.record_repair(duration_minutes)
         self.log_event(f"Fixed issue in {repo}", detail)
 
+    def simulate_success(self, repo: str, detail: str, duration_minutes: float) -> None:
+        self.report_fix(repo, detail, duration_minutes)
+
     def simulate_panic(self) -> None:
         def _boom():
             raise RuntimeError("Simulated repair failure")
