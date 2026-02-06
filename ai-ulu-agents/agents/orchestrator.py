@@ -63,11 +63,33 @@ class Orchestrator(BaseAgent):
         except (OSError, json.JSONDecodeError):
             return {}
 
+    def _policy_for_repo(self, policy: Dict[str, Any], target: str) -> Dict[str, Any]:
+        repos = policy.get("repositories", {})
+        if target in repos:
+            return repos[target]
+        # Try by repo name if target looks like org/repo
+        if "/" in target:
+            _, name = target.split("/", 1)
+            for key, value in repos.items():
+                if key.endswith(f"/{name}"):
+                    return value
+        return {"class": "muscle", "priority_weight": 1.0, "allowed_agents": [], "chaos_allowed": True}
+
+    def _is_agent_allowed(self, policy: Dict[str, Any], target: str, task_type: str) -> bool:
+        repo_policy = self._policy_for_repo(policy, target)
+        allowed = [a.upper() for a in repo_policy.get("allowed_agents", [])]
+        if not allowed:
+            return True
+        return task_type.upper() in allowed
+
     def _score_task(self, task: Dict[str, Any], policy: Dict[str, Any], rsi: float) -> int:
         priority = (task.get("priority") or "normal").lower()
         impact = (task.get("impact") or "normal").lower()
-        category = (task.get("category") or "muscle").lower()
         task_type = (task.get("type") or "").upper()
+        target = task.get("target", "unknown")
+        repo_policy = self._policy_for_repo(policy, target)
+        category = (repo_policy.get("class") or task.get("category") or "muscle").lower()
+        weight = float(repo_policy.get("priority_weight", 1.0))
 
         score = 0
         score += 100 if priority == "high" else 10 if priority == "normal" else 1
@@ -76,9 +98,12 @@ class Orchestrator(BaseAgent):
             score += 100
 
         if policy.get("defer_chaos_when_rsi_low", False) and task_type == "CHAOS":
-            if rsi < float(policy.get("rsi_pause_chaos_below", 95)):
+            threshold = float(policy.get("global_thresholds", {}).get("rsi_pause_chaos_below", 95))
+            if rsi < threshold:
                 score -= 200
-        return score
+        if repo_policy.get("chaos_allowed") is False and task_type == "CHAOS":
+            score -= 500
+        return int(score * weight)
 
     def _pick_next_task(self, policy: Dict[str, Any], rsi: float) -> Dict[str, Any]:
         data = self.queue.snapshot()
@@ -125,8 +150,18 @@ class Orchestrator(BaseAgent):
             package = task.get("package", "unknown")
             note = task.get("note", "update check")
             agent.log_activity(f"Watcher flagged {package} for {target}: {note}", icon="[WATCH]", task_id=task_id)
+            repo_policy = self._policy_for_repo(self._load_policy(), target)
+            category = repo_policy.get("class", "muscle")
             # Optional: turn watch event into repair task for repo
-            self.queue.enqueue({"type": "REPAIR", "target": target, "priority": "normal"})
+            self.queue.enqueue(
+                {
+                    "type": "REPAIR",
+                    "target": target,
+                    "priority": "normal",
+                    "impact": "normal",
+                    "category": category,
+                }
+            )
             self.memory.record_agent_result(agent_id, True)
             return "watch_dispatched"
         if task_type == "SELF_HEAL":
@@ -170,6 +205,19 @@ class Orchestrator(BaseAgent):
             task = {}
         if not task:
             return
+        task_type = (task.get("type") or "").upper()
+        target = task.get("target", "unknown")
+        repo_policy = self._policy_for_repo(policy, target)
+        if not self._is_agent_allowed(policy, target, task_type):
+            self.log_activity(f"Policy blocked {task_type} on {target}", icon="[BLOCK]", task_id=task.get("id", ""))
+            self.queue.complete(task, "blocked_by_policy")
+            return
+        if task_type == "CHAOS" and repo_policy.get("chaos_allowed") is False:
+            self.log_activity(f"Chaos disabled by policy for {target}", icon="[BLOCK]", task_id=task.get("id", ""))
+            self.queue.complete(task, "blocked_by_policy")
+            return
+        if repo_policy.get("class") == "archive":
+            self.log_activity(f"Archive repo flagged for migration: {target}", icon="[ARCHIVE]", task_id=task.get("id", ""))
         result = self.dispatch(task)
         self.queue.complete(task, result)
 

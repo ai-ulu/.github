@@ -32,6 +32,8 @@ class Watcher(BaseAgent):
                 "type": "WATCH",
                 "target": repo,
                 "priority": item.get("priority", "normal"),
+                "impact": item.get("impact", "normal"),
+                "category": item.get("category", "muscle"),
                 "package": package,
                 "note": item.get("note", "update check"),
             }

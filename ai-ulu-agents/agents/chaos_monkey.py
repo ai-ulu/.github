@@ -10,11 +10,20 @@ class ChaosMonkey(BaseAgent):
         super().__init__(name="ChaosMonkey", memory=memory)
         self.queue = queue or TaskQueue()
 
-    def schedule_chaos(self, target: str, scenario: str, priority: str = "normal") -> None:
+    def schedule_chaos(
+        self,
+        target: str,
+        scenario: str,
+        priority: str = "normal",
+        impact: str = "normal",
+        category: str = "muscle",
+    ) -> None:
         task: Dict[str, Any] = {
             "type": "CHAOS",
             "target": target,
             "priority": priority,
+            "impact": impact,
+            "category": category,
             "scenario": scenario,
         }
         self.queue.enqueue(task)

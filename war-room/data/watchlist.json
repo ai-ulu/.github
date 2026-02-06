@@ -3,6 +3,8 @@
     {
       "repo": "ai-ulu/qa-repo",
       "package": "requests",
+      "impact": "normal",
+      "category": "unicorn",
       "priority": "normal",
       "note": "security update check"
     }
