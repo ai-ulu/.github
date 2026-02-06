@@ -235,7 +235,7 @@ def main():
         
         print(f"OK Agent log updated with {len(activities)} activities")
         
-        # Update repos.json
+        # Update repos.json (safe-fail if no API data)
         repo_data = []
         for repo in public_repos:
             aura = calculate_repo_aura(repo)
@@ -248,14 +248,17 @@ def main():
                 'stars': repo.stargazers_count
             })
 
-        repos_json = {
-            'repositories': sorted(repo_data, key=lambda x: x['aura'], reverse=True),
-            'total_count': len(repo_data),
-            'last_update': datetime.now().isoformat()
-        }
+        if not repo_data:
+            print("Warning: no repo data from API; keeping existing repos.json")
+        else:
+            repos_json = {
+                'repositories': sorted(repo_data, key=lambda x: x['aura'], reverse=True),
+                'total_count': len(repo_data),
+                'last_update': datetime.now().isoformat()
+            }
 
-        with open('war-room/data/repos.json', 'w') as f:
-            json.dump(repos_json, f, indent=2)
+            with open('war-room/data/repos.json', 'w') as f:
+                json.dump(repos_json, f, indent=2)
 
         # Update dashboard_data.json (policy + repo aggregation)
         policy_path = os.path.join('war-room', 'data', 'policy.json')
@@ -266,7 +269,16 @@ def main():
 
         class_counts = {'unicorn': 0, 'muscle': 0, 'archive': 0}
         class_aura = {'unicorn': [], 'muscle': [], 'archive': []}
-        repos_by_name = {r['name']: r for r in repo_data}
+
+        # Prefer existing repos.json if API data is empty
+        repos_source = repo_data
+        if not repos_source:
+            try:
+                with open('war-room/data/repos.json', 'r') as rf:
+                    repos_source = json.load(rf).get('repositories', [])
+            except (OSError, json.JSONDecodeError):
+                repos_source = []
+        repos_by_name = {r.get('name'): r for r in repos_source}
 
         for full, meta in policy.get('repositories', {}).items():
             repo_class = (meta.get('class') or 'muscle').lower()
@@ -285,7 +297,8 @@ def main():
             'premium_ratio': (
                 round(class_counts.get('unicorn', 0) / max(1, sum(class_counts.values())), 2)
             ),
-            'advice': 'RSI low: chaos deferred' if rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)) else 'Stable: chaos allowed'
+            'advice': 'RSI low: chaos deferred' if rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)) else 'Stable: chaos allowed',
+            'policy_last_update': datetime.now().isoformat()
         }
 
         with open('war-room/data/dashboard_data.json', 'w') as f:
