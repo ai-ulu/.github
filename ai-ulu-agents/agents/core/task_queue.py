@@ -25,7 +25,7 @@ class TaskQueue:
     def enqueue(self, task: Dict[str, Any]) -> None:
         data = self._read()
         task = {
-            "id": task.get("id"),
+            "id": task.get("id") or f"task_{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}",
             "type": task.get("type"),
             "target": task.get("target"),
             "priority": task.get("priority", "normal"),
@@ -51,7 +51,8 @@ class TaskQueue:
         if not pending:
             return {}
         high = [t for t in pending if (t.get("priority") or "").lower() == "high"]
-        return high[0] if high else pending[0]
+        normal = [t for t in pending if (t.get("priority") or "").lower() != "high"]
+        return (high + normal)[0]
 
     def complete(self, task: Dict[str, Any], result: str) -> None:
         data = self._read()

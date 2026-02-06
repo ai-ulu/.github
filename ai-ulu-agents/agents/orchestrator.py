@@ -30,6 +30,10 @@ class Orchestrator(BaseAgent):
             return "repair_dispatched"
         if task_type == "SELF_HEAL":
             agent = SelfHealingAgent(memory=self.memory)
+            metrics = self.memory.get_sync_metrics()
+            if not metrics.get("panic_status"):
+                self.log_activity("Self-heal skipped (no panic)", icon="[HEAL]", task_id=task_id)
+                return "self_heal_skipped"
             agent.check_system_health()
             self.log_activity("Dispatched self-heal", icon="[HEAL]", task_id=task_id)
             return "self_heal_dispatched"

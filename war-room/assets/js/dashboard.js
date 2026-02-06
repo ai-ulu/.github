@@ -276,7 +276,8 @@ class WarRoomDashboard {
                     listEl.innerHTML = items
                         .map((task) => {
                             const type = (task.type || 'TASK').toUpperCase();
-                            return `<li>[${type}]</li>`;
+                            const priority = (task.priority || 'normal').toUpperCase();
+                            return `<li>[${type}] ${priority}</li>`;
                         })
                         .join('');
                 }
