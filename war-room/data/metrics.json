@@ -2,12 +2,15 @@
   "company_name": "ai-ulu",
   "vision": "Autonomous Agentic Engineering",
   "aor": 92.5,
-  "rsi": 55.0,
+  "rsi": 23.8,
   "mttr": 3.33,
   "active_repos": 0,
+  "total_repos": 0,
+  "public_repos": 0,
+  "private_repos": 0,
   "last_chaos": "none",
   "chaos_success": "100.0%",
   "chaos_scenarios": 4,
   "valuation_multiplier": "1.5x (Automation Premium)",
-  "last_sync": "2026-02-06T16:51:51.992816"
+  "last_sync": "2026-02-06T23:07:31.594917"
 }

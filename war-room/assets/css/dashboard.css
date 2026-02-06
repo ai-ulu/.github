@@ -525,6 +525,62 @@ section {
     gap: 1.5rem;
 }
 
+.kingdom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.kingdom-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.kingdom-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--accent-cyan);
+}
+
+.premium-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.premium-value {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    color: var(--accent-green);
+    text-shadow: var(--glow-green);
+    margin-bottom: 0.5rem;
+}
+
+.premium-note {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.kingdom-advice {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(178, 75, 243, 0.1);
+    border: 1px solid rgba(178, 75, 243, 0.3);
+    border-radius: 12px;
+}
+
+.kingdom-advice h3 {
+    font-family: var(--font-display);
+    color: var(--accent-purple);
+    margin-bottom: 0.5rem;
+}
+
 .chaos-card {
     background: var(--bg-card);
     border-radius: 15px;

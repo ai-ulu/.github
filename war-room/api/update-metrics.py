@@ -239,23 +239,57 @@ def main():
         repo_data = []
         for repo in public_repos:
             aura = calculate_repo_aura(repo)
-                repo_data.append({
-                    'name': repo.name,
-                    'aura': aura,
-                    'health': get_repo_health(aura),
-                    'category': 'unicorn' if aura >= 90 else 'muscle',
-                    'updated_at': repo.updated_at.isoformat() if repo.updated_at else None,
-                    'stars': repo.stargazers_count
-                })
-        
+            repo_data.append({
+                'name': repo.name,
+                'aura': aura,
+                'health': get_repo_health(aura),
+                'category': 'unicorn' if aura >= 90 else 'muscle',
+                'updated_at': repo.updated_at.isoformat() if repo.updated_at else None,
+                'stars': repo.stargazers_count
+            })
+
         repos_json = {
             'repositories': sorted(repo_data, key=lambda x: x['aura'], reverse=True),
             'total_count': len(repo_data),
             'last_update': datetime.now().isoformat()
         }
-        
+
         with open('war-room/data/repos.json', 'w') as f:
             json.dump(repos_json, f, indent=2)
+
+        # Update dashboard_data.json (policy + repo aggregation)
+        policy_path = os.path.join('war-room', 'data', 'policy.json')
+        policy = {}
+        if os.path.exists(policy_path):
+            with open(policy_path, 'r', encoding='utf-8') as pf:
+                policy = json.load(pf)
+
+        class_counts = {'unicorn': 0, 'muscle': 0, 'archive': 0}
+        class_aura = {'unicorn': [], 'muscle': [], 'archive': []}
+        repos_by_name = {r['name']: r for r in repo_data}
+
+        for full, meta in policy.get('repositories', {}).items():
+            repo_class = (meta.get('class') or 'muscle').lower()
+            class_counts[repo_class] = class_counts.get(repo_class, 0) + 1
+            name = full.split('/')[-1]
+            aura = repos_by_name.get(name, {}).get('aura')
+            if aura is not None:
+                class_aura[repo_class].append(aura)
+
+        def avg(values):
+            return round(sum(values) / len(values), 2) if values else 0
+
+        dashboard_data = {
+            'class_counts': class_counts,
+            'class_avg_aura': {k: avg(v) for k, v in class_aura.items()},
+            'premium_ratio': (
+                round(class_counts.get('unicorn', 0) / max(1, sum(class_counts.values())), 2)
+            ),
+            'advice': 'RSI low: chaos deferred' if rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)) else 'Stable: chaos allowed'
+        }
+
+        with open('war-room/data/dashboard_data.json', 'w') as f:
+            json.dump(dashboard_data, f, indent=2)
         
         print(f"OK Repository data updated for {len(repo_data)} repos")
         print("Done Dashboard metrics update complete!")

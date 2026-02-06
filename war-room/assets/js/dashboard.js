@@ -9,6 +9,7 @@ class WarRoomDashboard {
         this.memoryUrl = 'data/agent_memory.json';
         this.queueUrl = 'data/task_queue.json';
         this.classifyUrl = 'data/classify_queue.json';
+        this.dashboardDataUrl = 'data/dashboard_data.json';
         this.updateInterval = 30000; // 30 seconds
         this.translations = {
             en: {
@@ -39,7 +40,12 @@ class WarRoomDashboard {
                 queue_empty: 'empty',
                 repos_meta: 'Total {total} (Public {public}, Private {private})',
                 classify_title: 'Classification Proposals',
-                classify_empty: 'none'
+                classify_empty: 'none',
+                section_kingdom: 'Kingdom Map',
+                chart_distribution: 'Repo Distribution',
+                chart_power: 'Aura Power Meter',
+                premium_indicator: 'Premium Indicator',
+                strategic_advice: 'Strategic Advice'
             },
             tr: {
                 tagline: 'Otonom Ajan Mühendisligi - Canli Misyon Kontrol',
@@ -69,7 +75,12 @@ class WarRoomDashboard {
                 queue_empty: 'bos',
                 repos_meta: 'Toplam {total} (Acik {public}, Gizli {private})',
                 classify_title: 'Siniflandirma Onerileri',
-                classify_empty: 'yok'
+                classify_empty: 'yok',
+                section_kingdom: 'Krallik Haritasi',
+                chart_distribution: 'Repo Dagilimi',
+                chart_power: 'Aura Guc Olceri',
+                premium_indicator: 'Premium Gosterge',
+                strategic_advice: 'Stratejik Tavsiye'
             }
         };
         this.lang = this.getDefaultLanguage();
@@ -89,6 +100,7 @@ class WarRoomDashboard {
         await this.checkPanic();
         await this.loadQueueStatus();
         await this.loadClassifyStatus();
+        await this.loadKingdomMap();
 
         // Set up auto-refresh
         setInterval(() => this.loadMetrics(), this.updateInterval);
@@ -97,6 +109,7 @@ class WarRoomDashboard {
         setInterval(() => this.checkPanic(), this.updateInterval);
         setInterval(() => this.loadQueueStatus(), this.updateInterval);
         setInterval(() => this.loadClassifyStatus(), this.updateInterval);
+        setInterval(() => this.loadKingdomMap(), this.updateInterval * 2);
 
         console.log('OK War Room Dashboard ready');
     }
@@ -436,6 +449,86 @@ class WarRoomDashboard {
         } catch (error) {
             listEl.innerHTML = '<li>--</li>';
         }
+    }
+
+    async loadKingdomMap() {
+        const premiumValue = document.getElementById('premium-value');
+        const premiumNote = document.getElementById('premium-note');
+        const adviceText = document.getElementById('advice-text');
+        try {
+            const response = await fetch(this.dashboardDataUrl);
+            if (!response.ok) return;
+            const data = await response.json();
+
+            if (premiumValue) {
+                premiumValue.textContent = `${Math.round((data.premium_ratio || 0) * 100)}%`;
+            }
+            if (premiumNote) {
+                premiumNote.textContent = 'Unicorn / Total';
+            }
+            if (adviceText) {
+                adviceText.textContent = data.advice || '--';
+            }
+
+            this.renderDistributionChart(data.class_counts || {});
+            this.renderPowerChart(data.class_avg_aura || {});
+        } catch (error) {
+            // noop
+        }
+    }
+
+    renderDistributionChart(counts) {
+        const ctx = document.getElementById('distribution-chart');
+        if (!ctx || !window.Chart) return;
+        const labels = ['Unicorn', 'Muscle', 'Archive'];
+        const values = [
+            counts.unicorn || 0,
+            counts.muscle || 0,
+            counts.archive || 0
+        ];
+        if (this.distributionChart) this.distributionChart.destroy();
+        this.distributionChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#00ff88', '#00f5ff', '#b24bf3']
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#8b9dc3' } } }
+            }
+        });
+    }
+
+    renderPowerChart(auras) {
+        const ctx = document.getElementById('power-chart');
+        if (!ctx || !window.Chart) return;
+        const labels = ['Unicorn', 'Muscle', 'Archive'];
+        const values = [
+            auras.unicorn || 0,
+            auras.muscle || 0,
+            auras.archive || 0
+        ];
+        if (this.powerChart) this.powerChart.destroy();
+        this.powerChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#00ff88', '#00f5ff', '#b24bf3']
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#8b9dc3' } },
+                    y: { ticks: { color: '#8b9dc3' } }
+                }
+            }
+        });
     }
 
     async checkPanic() {

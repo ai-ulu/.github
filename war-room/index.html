@@ -162,6 +162,32 @@
             </div>
         </section>
 
+        <!-- Kingdom Map -->
+        <section class="kingdom-map">
+            <div class="section-header">
+                <h2 data-i18n="section_kingdom">Kingdom Map</h2>
+            </div>
+            <div class="kingdom-grid">
+                <div class="kingdom-card">
+                    <h3 data-i18n="chart_distribution">Repo Distribution</h3>
+                    <canvas id="distribution-chart"></canvas>
+                </div>
+                <div class="kingdom-card">
+                    <h3 data-i18n="chart_power">Aura Power Meter</h3>
+                    <canvas id="power-chart"></canvas>
+                </div>
+                <div class="kingdom-card premium-card">
+                    <h3 data-i18n="premium_indicator">Premium Indicator</h3>
+                    <div class="premium-value" id="premium-value">--</div>
+                    <div class="premium-note" id="premium-note">--</div>
+                </div>
+            </div>
+            <div class="kingdom-advice">
+                <h3 data-i18n="strategic_advice">Strategic Advice</h3>
+                <div id="advice-text">--</div>
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer class="footer">
             <p data-i18n="footer_line">(c) 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem</p>
@@ -171,6 +197,7 @@
     </div>
 
     <script src="assets/js/matrix.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
 </body>
 
