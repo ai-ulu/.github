@@ -81,6 +81,7 @@
     "ai-ulu/babysteps": {
       "class": "archive",
       "priority_weight": 0.2,
+      "note": "move_to_personal_profile",
       "allowed_agents": [
         "WATCH"
       ],
@@ -89,6 +90,7 @@
     "ai-ulu/nisanproclean": {
       "class": "archive",
       "priority_weight": 0.2,
+      "note": "move_to_personal_profile",
       "allowed_agents": [
         "WATCH"
       ],
