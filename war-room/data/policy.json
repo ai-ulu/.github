@@ -10,38 +10,72 @@
     "ai-ulu/UluCore": {
       "class": "unicorn",
       "priority_weight": 1.5,
-      "allowed_agents": ["REPAIR", "SELF_HEAL", "WATCH"],
+      "allowed_agents": [
+        "REPAIR",
+        "SELF_HEAL",
+        "WATCH"
+      ],
       "chaos_allowed": false
     },
     "ai-ulu/Nexus-Agi": {
-      "class": "muscle",
+      "class": "unicorn",
       "priority_weight": 1.0,
-      "allowed_agents": ["REPAIR", "SELF_HEAL", "WATCH", "CHAOS"],
-      "chaos_allowed": true
+      "allowed_agents": [
+        "REPAIR",
+        "SELF_HEAL",
+        "WATCH",
+        "CHAOS"
+      ],
+      "chaos_allowed": false
     },
     "ai-ulu/GodFather": {
       "class": "unicorn",
       "priority_weight": 1.4,
-      "allowed_agents": ["REPAIR", "SELF_HEAL", "WATCH"],
+      "allowed_agents": [
+        "REPAIR",
+        "SELF_HEAL",
+        "WATCH"
+      ],
       "chaos_allowed": false
     },
     "ai-ulu/QA": {
       "class": "unicorn",
       "priority_weight": 1.3,
-      "allowed_agents": ["REPAIR", "SELF_HEAL", "WATCH", "CHAOS"],
+      "allowed_agents": [
+        "REPAIR",
+        "SELF_HEAL",
+        "WATCH",
+        "CHAOS"
+      ],
       "chaos_allowed": true
     },
     "ai-ulu/GitAura": {
       "class": "unicorn",
       "priority_weight": 1.2,
-      "allowed_agents": ["REPAIR", "SELF_HEAL", "WATCH"],
+      "allowed_agents": [
+        "REPAIR",
+        "SELF_HEAL",
+        "WATCH"
+      ],
       "chaos_allowed": false
     },
     "ai-ulu/legacy-archive": {
       "class": "archive",
       "priority_weight": 0.2,
-      "allowed_agents": ["WATCH"],
+      "allowed_agents": [
+        "WATCH"
+      ],
       "chaos_allowed": false
+    },
+    "ai-ulu/GitHubTarayici": {
+      "class": "archive",
+      "priority_weight": 1.0,
+      "allowed_agents": [
+        "REPAIR",
+        "SELF_HEAL",
+        "WATCH"
+      ],
+      "chaos_allowed": true
     }
   },
   "idle_tasks": [
