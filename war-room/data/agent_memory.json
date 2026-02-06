@@ -1,6 +1,11 @@
 {
   "activities": [
     {
+      "icon": "[WATCH]",
+      "text": "Watcher: Enqueued 1 watch tasks",
+      "time": "Just now"
+    },
+    {
       "icon": "[HEAL]",
       "text": "Orchestrator: Dispatched self-heal (task task_605f75ff)",
       "time": "Just now"
@@ -43,11 +48,6 @@
     {
       "icon": "[+]",
       "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
-      "time": "Just now"
-    },
-    {
-      "icon": "[REPAIR]",
-      "text": "Orchestrator: Dispatched repair to ai-ulu/qa-repo (task task_001)",
       "time": "Just now"
     }
   ],

@@ -1,5 +1,13 @@
 {
-  "pending": [],
+  "pending": [
+    {
+      "id": "task_20260206150448003572",
+      "type": "WATCH",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "created_at": "2026-02-06T15:04:48.004084Z"
+    }
+  ],
   "in_progress": [],
   "completed": [
     {
