@@ -1,14 +1,45 @@
 {
-  "activities": [],
+  "activities": [
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: RepairAgent: panic_test -> error: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[ALARM]",
+      "text": "PANIC: RepairAgent failed during panic_test: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: RepairAgent: Fixed issue in repo-c -> Resolved lockfile mismatch",
+      "time": "Just now"
+    },
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: RepairAgent: Fixed issue in repo-b -> Fixed CI cache issue",
+      "time": "Just now"
+    },
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: RepairAgent: Fixed issue in repo-a -> Just fixed a dependency bug!",
+      "time": "Just now"
+    }
+  ],
   "stats": {
-    "repairs": 0,
-    "total_time": 0.0,
-    "repair_times": [],
-    "operations": 0,
-    "panic_count": 0,
+    "repairs": 3,
+    "total_time": 10.0,
+    "repair_times": [
+      3.2,
+      4.1,
+      2.7
+    ],
+    "operations": 4,
+    "panic_count": 1,
     "panic_resolved": 0
   },
-  "panic_status": false,
-  "panic_reason": null,
-  "panic_at": null
+  "panic_status": true,
+  "panic_reason": "RepairAgent failed during panic_test: Simulated repair failure",
+  "panic_at": "2026-02-06T12:45:59.704250Z",
+  "last_repair_at": "2026-02-06T12:45:59.655487Z"
 }

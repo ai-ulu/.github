@@ -13,7 +13,7 @@ def get_github_client():
     """Initialize GitHub client with token"""
     token = os.getenv('GITHUB_TOKEN')
     if not token:
-        raise ValueError("GITHUB_TOKEN environment variable not set")
+        return None
     return Github(token)
 
 def calculate_aor(repos):
@@ -173,9 +173,12 @@ def main():
     
     try:
         gh = get_github_client()
-        org = gh.get_organization('ai-ulu')
-        repos = list(org.get_repos())
-        public_repos = [repo for repo in repos if not repo.private]
+        repos = []
+        public_repos = []
+        if gh:
+            org = gh.get_organization('ai-ulu')
+            repos = list(org.get_repos())
+            public_repos = [repo for repo in repos if not repo.private]
         
         print(f"Found Found {len(repos)} repositories")
         

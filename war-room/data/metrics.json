@@ -1,13 +1,13 @@
 {
-    "company_name": "ai-ulu",
-    "vision": "Autonomous Agentic Engineering",
-    "aor": 92.5,
-    "rsi": 98.4,
-    "mttr": 4.2,
-    "active_repos": 30,
-    "last_chaos": "dependency_corruption (2 days ago)",
-    "chaos_success": "98.4%",
-    "chaos_scenarios": 24,
-    "valuation_multiplier": "1.5x (Automation Premium)",
-    "last_sync": "2026-02-06T11:00:00Z"
+  "company_name": "ai-ulu",
+  "vision": "Autonomous Agentic Engineering",
+  "aor": 92.5,
+  "rsi": 80.0,
+  "mttr": 3.33,
+  "active_repos": 0,
+  "last_chaos": "2026-02-06T12:45:59.704250Z",
+  "chaos_success": "0.0%",
+  "chaos_scenarios": 1,
+  "valuation_multiplier": "1.5x (Automation Premium)",
+  "last_sync": "2026-02-06T15:46:41.052468"
 }
