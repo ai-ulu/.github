@@ -239,14 +239,16 @@ def main():
         repo_data = []
         for repo in public_repos:
             aura = calculate_repo_aura(repo)
-            repo_data.append({
-                'name': repo.name,
-                'aura': aura,
-                'health': get_repo_health(aura),
-                'category': 'unicorn' if aura >= 90 else 'muscle',
-                'updated_at': repo.updated_at.isoformat() if repo.updated_at else None,
-                'stars': repo.stargazers_count
-            })
+            repo_data.append(
+                {
+                    'name': repo.name,
+                    'aura': aura,
+                    'health': get_repo_health(aura),
+                    'category': 'unicorn' if aura >= 90 else 'muscle',
+                    'updated_at': repo.updated_at.isoformat() if repo.updated_at else None,
+                    'stars': repo.stargazers_count,
+                }
+            )
 
         if not repo_data:
             print("Warning: no repo data from API; keeping existing repos.json")
