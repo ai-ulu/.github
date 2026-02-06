@@ -6,13 +6,13 @@ class WarRoomDashboard {
         this.metricsUrl = 'data/metrics.json';
         this.agentLogUrl = 'data/agent-log.json';
         this.reposUrl = 'data/repos.json';
-        this.updateInterval = 15000; // 15 seconds
+        this.updateInterval = 30000; // 30 seconds
 
         this.init();
     }
 
     async init() {
-        console.log('🏰 War Room Dashboard initializing...');
+        console.log(' War Room Dashboard initializing...');
 
         // Load initial data
         await this.loadMetrics();
@@ -24,7 +24,7 @@ class WarRoomDashboard {
         setInterval(() => this.loadAgentLog(), this.updateInterval);
         setInterval(() => this.loadRepositories(), this.updateInterval * 4); // Repos update less frequently
 
-        console.log('✅ War Room Dashboard ready');
+        console.log('OK War Room Dashboard ready');
     }
 
     async loadMetrics() {
@@ -134,22 +134,22 @@ class WarRoomDashboard {
     useFallbackAgentLog() {
         const fallbackActivities = [
             {
-                icon: '🛡️',
+                icon: '[REPAIR]',
                 text: 'Repair Agent: System monitoring active across 30 repositories',
                 time: 'Just now'
             },
             {
-                icon: '📣',
+                icon: '[MEDIA]',
                 text: 'Media Agent: Ready to generate marketing content on demand',
                 time: '5 min ago'
             },
             {
-                icon: '🌀',
+                icon: '[CHAOS]',
                 text: 'Chaos Monkey: Scheduled for next Monday 02:00 UTC',
                 time: '1 hour ago'
             },
             {
-                icon: '⚡',
+                icon: '[SYSTEM]',
                 text: 'System: All autonomous operations running smoothly',
                 time: '2 hours ago'
             }

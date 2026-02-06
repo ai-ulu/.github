@@ -1,4 +1,8 @@
-# 🏰 AI-ULU War Room Dashboard
+# AI-ULU War Room Dashboard
+
+TOP SECRET: This dashboard is public by design. Do not publish any private repo data,
+secrets, internal hostnames, or sensitive metrics. Only public-safe metrics should
+land in war-room/data/*.json.
 
 > **Real-time Mission Control for the Autonomous Agentic Engineering Ecosystem**
 
@@ -8,9 +12,9 @@
 
 ---
 
-## 🎯 Overview
+## Overview
 
-The **War Room Dashboard** is a stunning, real-time monitoring interface that visualizes the autonomous operations of the entire ai-ulu ecosystem. Built with a Matrix-inspired cyberpunk aesthetic, it provides instant visibility into:
+The **War Room Dashboard** is a real-time monitoring interface that visualizes the autonomous operations of the entire ai-ulu ecosystem. Built with a Matrix-inspired cyberpunk aesthetic, it provides instant visibility into:
 
 - **Autonomous Operation Rate (AOR)** - % of operations running without human intervention
 - **Resilience Stability Index (RSI)** - System reliability and self-healing capability
@@ -21,21 +25,21 @@ The **War Room Dashboard** is a stunning, real-time monitoring interface that vi
 
 ---
 
-## 🚀 Features
+## Features
 
-### 🎨 Visual Design
+### Visual Design
 - **Matrix Rain Background** - Animated falling characters effect
 - **Cyberpunk Aesthetic** - Neon colors (cyan, purple, green) with glows and gradients
-- **Responsive Layout** - Works perfectly on desktop, tablet, and mobile
+- **Responsive Layout** - Works on desktop, tablet, and mobile
 - **Smooth Animations** - Micro-interactions and transitions throughout
 
-### 📊 Real-Time Data
+### Real-Time Data
 - **Auto-Refresh** - Metrics update every 15 seconds
 - **GitHub API Integration** - Live data from organization repositories
 - **Fallback Data** - Graceful degradation if API is unavailable
 - **Smart Caching** - Optimized performance with minimal API calls
 
-### 🤖 Autonomous Updates
+### Autonomous Updates
 - **GitHub Actions** - Automated deployment every 15 minutes
 - **Metric Calculation** - AOR, RSI, MTTR computed from real repository data
 - **Agent Activity Tracking** - Monitors commits, PRs, and issues for agent signatures
@@ -43,29 +47,29 @@ The **War Room Dashboard** is a stunning, real-time monitoring interface that vi
 
 ---
 
-## 📁 Structure
+## Structure
 
 ```
 war-room/
-├── index.html                    # Main dashboard page
-├── assets/
-│   ├── css/
-│   │   └── dashboard.css        # Matrix-style cyberpunk CSS
-│   ├── js/
-│   │   ├── matrix.js            # Matrix rain background effect
-│   │   └── dashboard.js         # Real-time data loading & UI updates
-│   └── img/                     # Images and icons
-├── api/
-│   └── update-metrics.py        # Python script for GitHub API data collection
-└── data/
-    ├── metrics.json             # Current system metrics
-    ├── agent-log.json           # Recent agent activities
-    └── repos.json               # Repository health data
+|-- index.html                    # Main dashboard page
+|-- assets/
+|   |-- css/
+|   |   `-- dashboard.css        # Matrix-style cyberpunk CSS
+|   |-- js/
+|   |   |-- matrix.js            # Matrix rain background effect
+|   |   `-- dashboard.js         # Real-time data loading and UI updates
+|   `-- img/                     # Images and icons
+|-- api/
+|   `-- update-metrics.py        # Python script for GitHub API data collection
+`-- data/
+    |-- metrics.json             # Current system metrics
+    |-- agent-log.json           # Recent agent activities
+    `-- repos.json               # Repository health data
 ```
 
 ---
 
-## 🛠️ Deployment
+## Deployment
 
 ### Automated (Recommended)
 
@@ -91,12 +95,23 @@ git push
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
 ```bash
 GITHUB_TOKEN=your_github_token_here
+```
+
+### GitHub Actions Permissions
+
+Ensure the workflow uses the minimal permissions needed for GitHub Pages:
+
+```yaml
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 ```
 
 ### Customization
@@ -109,18 +124,18 @@ Edit `war-room/data/*.json` files to customize:
 
 ---
 
-## 📈 Metrics Explained
+## Metrics Explained
 
 | Metric | Description | Target | Current |
 |--------|-------------|--------|---------|
-| **AOR** | % of operations completed autonomously | ≥ 95% | 92.5% |
-| **RSI** | System reliability and self-healing rate | ≥ 99% | 98.4% |
+| **AOR** | % of operations completed autonomously | >= 95% | 92.5% |
+| **RSI** | System reliability and self-healing rate | >= 99% | 98.4% |
 | **MTTR** | Average time to detect and fix issues | < 4 min | 4.2 min |
 | **Active Repos** | Repositories updated in last 30 days | 30+ | 30 |
 
 ---
 
-## 🎨 Design Philosophy
+## Design Philosophy
 
 The War Room Dashboard embodies the **"Autonomous AI Operating System"** vision:
 
@@ -131,18 +146,18 @@ The War Room Dashboard embodies the **"Autonomous AI Operating System"** vision:
 
 ---
 
-## 🚦 Status
+## Status
 
-- ✅ **UI/UX Design** - Complete
-- ✅ **Matrix Background** - Implemented
-- ✅ **Real-time Metrics** - Working
-- ✅ **GitHub API Integration** - Functional
-- ✅ **Auto-deployment** - Configured
-- ✅ **Mobile Responsive** - Optimized
+- OK **UI/UX Design** - Complete
+- OK **Matrix Background** - Implemented
+- OK **Real-time Metrics** - Working
+- OK **GitHub API Integration** - Functional
+- OK **Auto-deployment** - Configured
+- OK **Mobile Responsive** - Optimized
 
 ---
 
-## 🔗 Links
+## Links
 
 - **Live Dashboard**: `https://ai-ulu.github.io` (after deployment)
 - **GitHub Repository**: `https://github.com/ai-ulu/.github`
@@ -150,7 +165,7 @@ The War Room Dashboard embodies the **"Autonomous AI Operating System"** vision:
 
 ---
 
-## 📝 Next Steps
+## Next Steps
 
 1. **Enable GitHub Pages** in repository settings
 2. **Add GITHUB_TOKEN** secret for API access
@@ -159,6 +174,6 @@ The War Room Dashboard embodies the **"Autonomous AI Operating System"** vision:
 
 ---
 
-**Built with 💜 by the ai-ulu Autonomous Engineering Team**
+**Built with care by the ai-ulu Autonomous Engineering Team**
 
-*"Not a dashboard. Not a monitor. A War Room for the AI revolution."*
+"Not a dashboard. Not a monitor. A War Room for the AI revolution."

@@ -1,4 +1,4 @@
-# 🏰 ai-ulu: Otonom Ekosistem Teknik Mimarisi
+# ai-ulu: Otonom Ekosistem Teknik Mimarisi
 
 Bu belge, **ai-ulu** organizasyonunun "Kendi Kendini Yöneten Startup" vizyonunu hayata geçiren teknik katmanları detaylandırır.
 

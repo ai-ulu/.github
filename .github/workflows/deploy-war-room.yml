@@ -1,4 +1,4 @@
-name: 📊 Deploy War Room Dashboard
+name: Deploy War Room Dashboard
 
 on:
   push:

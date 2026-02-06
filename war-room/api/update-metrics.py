@@ -49,7 +49,7 @@ def calculate_mttr(repos):
     return 4.2
 
 def get_active_repos_count(repos):
-    """Count active repositories (updated in last 30 days)"""
+    """Count active public repositories (updated in last 30 days)"""
     from datetime import timedelta
     cutoff = datetime.now() - timedelta(days=30)
     
@@ -68,13 +68,13 @@ def get_agent_activities(repos):
                 message = commit.commit.message
                 if 'repair-agent' in message.lower():
                     activities.append({
-                        'icon': '🛡️',
+                        'icon': '[REPAIR]',
                         'text': f'Repair Agent: Fixed issue in {repo.name}',
                         'time': get_relative_time(commit.commit.author.date)
                     })
                 elif 'media-agent' in message.lower():
                     activities.append({
-                        'icon': '📣',
+                        'icon': '[MEDIA]',
                         'text': f'Media Agent: Generated content for {repo.name}',
                         'time': get_relative_time(commit.commit.author.date)
                     })
@@ -85,17 +85,17 @@ def get_agent_activities(repos):
     if not activities:
         activities = [
             {
-                'icon': '🛡️',
+                'icon': '[REPAIR]',
                 'text': 'Repair Agent: System monitoring active across all repositories',
                 'time': 'Just now'
             },
             {
-                'icon': '📣',
+                'icon': '[MEDIA]',
                 'text': 'Media Agent: Ready to generate marketing content',
                 'time': '5 min ago'
             },
             {
-                'icon': '🌀',
+                'icon': '[CHAOS]',
                 'text': 'Chaos Monkey: Scheduled for next Monday 02:00 UTC',
                 'time': '1 hour ago'
             }
@@ -150,20 +150,21 @@ def get_repo_health(aura):
         return 'poor'
 
 def main():
-    print("🔄 Updating War Room Dashboard metrics...")
+    print("Updating Updating War Room Dashboard metrics...")
     
     try:
         gh = get_github_client()
         org = gh.get_organization('ai-ulu')
         repos = list(org.get_repos())
+        public_repos = [repo for repo in repos if not repo.private]
         
-        print(f"📊 Found {len(repos)} repositories")
+        print(f"Found Found {len(repos)} repositories")
         
         # Calculate metrics
         aor = calculate_aor(repos)
         rsi = calculate_rsi(repos)
         mttr = calculate_mttr(repos)
-        active_repos = get_active_repos_count(repos)
+        active_repos = get_active_repos_count(public_repos)
         
         # Update metrics.json
         metrics = {
@@ -183,7 +184,7 @@ def main():
         with open('war-room/data/metrics.json', 'w') as f:
             json.dump(metrics, f, indent=2)
         
-        print(f"✅ Metrics updated: AOR={aor}%, RSI={rsi}%, MTTR={mttr}m")
+        print(f"OK Metrics updated: AOR={aor}%, RSI={rsi}%, MTTR={mttr}m")
         
         # Update agent-log.json
         activities = get_agent_activities(repos)
@@ -195,19 +196,18 @@ def main():
         with open('war-room/data/agent-log.json', 'w') as f:
             json.dump(agent_log, f, indent=2)
         
-        print(f"✅ Agent log updated with {len(activities)} activities")
+        print(f"OK Agent log updated with {len(activities)} activities")
         
         # Update repos.json
         repo_data = []
-        for repo in repos:
-            if not repo.private:  # Only public repos
-                aura = calculate_repo_aura(repo)
-                repo_data.append({
-                    'name': repo.name,
-                    'aura': aura,
-                    'health': get_repo_health(aura),
-                    'category': 'unicorn' if aura >= 90 else 'muscle'
-                })
+        for repo in public_repos:
+            aura = calculate_repo_aura(repo)
+            repo_data.append({
+                'name': repo.name,
+                'aura': aura,
+                'health': get_repo_health(aura),
+                'category': 'unicorn' if aura >= 90 else 'muscle'
+            })
         
         repos_json = {
             'repositories': sorted(repo_data, key=lambda x: x['aura'], reverse=True),
@@ -218,11 +218,11 @@ def main():
         with open('war-room/data/repos.json', 'w') as f:
             json.dump(repos_json, f, indent=2)
         
-        print(f"✅ Repository data updated for {len(repo_data)} repos")
-        print("🎉 Dashboard metrics update complete!")
+        print(f"OK Repository data updated for {len(repo_data)} repos")
+        print("Done Dashboard metrics update complete!")
         
     except Exception as e:
-        print(f"❌ Error updating metrics: {e}")
+        print(f"Error Error updating metrics: {e}")
         print("Using fallback data...")
         # Keep existing data if update fails
 
