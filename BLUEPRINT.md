@@ -63,6 +63,11 @@ and aligned with the current repo layout.
 - Chaos Monkey (stress testing).
 - Watcher (dependency update signal).
 
+### Phase 7: Decision Maker (Done)
+- Policy-driven task scoring (unicorn > muscle).
+- RSI guardrail (defer chaos when RSI is low).
+- Idle muscle tasks (safe, non-destructive upkeep).
+
 ## Runbook (Local)
 
 ### Simulate panic + auto-heal

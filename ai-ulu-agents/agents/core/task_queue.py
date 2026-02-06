@@ -34,6 +34,8 @@ class TaskQueue:
             "type": task.get("type"),
             "target": task.get("target"),
             "priority": task.get("priority", "normal"),
+            "impact": task.get("impact", "normal"),
+            "category": task.get("category", "muscle"),
             "created_at": task.get("created_at") or datetime.utcnow().isoformat() + "Z",
         }
         data["pending"].append(task)
@@ -44,8 +46,26 @@ class TaskQueue:
         task = self.get_next_task(data)
         if not task:
             return {}
+        task_id = task.get("id")
         pending = data.get("pending", [])
-        data["pending"] = [t for t in pending if t is not task]
+        if task_id:
+            data["pending"] = [t for t in pending if t.get("id") != task_id]
+        else:
+            data["pending"] = pending[1:]
+        task["started_at"] = datetime.utcnow().isoformat() + "Z"
+        data["in_progress"].append(task)
+        self._write(data)
+        return task
+
+    def pop_by_id(self, task_id: str) -> Dict[str, Any]:
+        if not task_id:
+            return {}
+        data = self._read()
+        pending = data.get("pending", [])
+        task = next((t for t in pending if t.get("id") == task_id), None)
+        if not task:
+            return {}
+        data["pending"] = [t for t in pending if t.get("id") != task_id]
         task["started_at"] = datetime.utcnow().isoformat() + "Z"
         data["in_progress"].append(task)
         self._write(data)

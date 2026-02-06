@@ -1,5 +1,6 @@
 import time
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Dict, Any
 
 import json
 import os
@@ -51,6 +52,42 @@ class Orchestrator(BaseAgent):
             if target == rule:
                 return True
         return False
+
+    def _load_policy(self) -> Dict[str, Any]:
+        policy_path = os.path.join("war-room", "data", "policy.json")
+        if not os.path.exists(policy_path):
+            return {}
+        try:
+            with open(policy_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return {}
+
+    def _score_task(self, task: Dict[str, Any], policy: Dict[str, Any], rsi: float) -> int:
+        priority = (task.get("priority") or "normal").lower()
+        impact = (task.get("impact") or "normal").lower()
+        category = (task.get("category") or "muscle").lower()
+        task_type = (task.get("type") or "").upper()
+
+        score = 0
+        score += 100 if priority == "high" else 10 if priority == "normal" else 1
+        score += 50 if impact == "high" else 10 if impact == "normal" else 1
+        if policy.get("prioritize_unicorn", False) and category == "unicorn":
+            score += 100
+
+        if policy.get("defer_chaos_when_rsi_low", False) and task_type == "CHAOS":
+            if rsi < float(policy.get("rsi_pause_chaos_below", 95)):
+                score -= 200
+        return score
+
+    def _pick_next_task(self, policy: Dict[str, Any], rsi: float) -> Dict[str, Any]:
+        data = self.queue.snapshot()
+        pending = data.get("pending", [])
+        if not pending:
+            return {}
+        scored = [(self._score_task(t, policy, rsi), t) for t in pending]
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return scored[0][1]
 
     def dispatch(self, task):
         task_type = (task.get("type") or "").upper()
@@ -108,16 +145,29 @@ class Orchestrator(BaseAgent):
         return "unknown_task"
 
     def run_once(self) -> None:
+        policy = self._load_policy()
         metrics = self.memory.get_sync_metrics()
+        rsi = float(metrics.get("rsi", 0.0))
         if metrics.get("panic_status") and not self.queue.has_task("SELF_HEAL"):
             self.queue.enqueue(
                 {
                     "type": "SELF_HEAL",
                     "target": "system",
                     "priority": "high",
+                    "impact": "high",
+                    "category": "unicorn",
                 }
             )
-        task = self.queue.dequeue()
+        if policy.get("allow_idle_muscle_tasks", False):
+            snapshot = self.queue.snapshot()
+            if not snapshot.get("pending"):
+                for task in policy.get("idle_tasks", []):
+                    self.queue.enqueue(task)
+        task = self._pick_next_task(policy, rsi)
+        if task:
+            task = self.queue.pop_by_id(task.get("id", ""))
+        else:
+            task = {}
         if not task:
             return
         result = self.dispatch(task)

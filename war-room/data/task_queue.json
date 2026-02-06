@@ -5,6 +5,8 @@
       "type": "WATCH",
       "target": "ai-ulu/qa-repo",
       "priority": "normal",
+      "impact": "normal",
+      "category": "muscle",
       "created_at": "2026-02-06T15:04:48.004084Z"
     },
     {
@@ -12,16 +14,85 @@
       "type": "CHAOS",
       "target": "ai-ulu/qa-repo",
       "priority": "high",
+      "impact": "high",
+      "category": "unicorn",
       "created_at": "2026-02-06T15:07:35.157702Z"
+    },
+    {
+      "id": "task_20260206151709084726",
+      "type": "CHAOS",
+      "target": "ai-ulu/qa-repo",
+      "priority": "high",
+      "impact": "high",
+      "category": "muscle",
+      "created_at": "2026-02-06T15:17:09.085260Z"
+    },
+    {
+      "id": "task_20260206151709349171",
+      "type": "REPAIR",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "muscle",
+      "created_at": "2026-02-06T15:17:09.349171Z"
+    },
+    {
+      "id": "task_20260206151757077771",
+      "type": "CHAOS",
+      "target": "ai-ulu/qa-repo",
+      "priority": "high",
+      "impact": "high",
+      "category": "muscle",
+      "created_at": "2026-02-06T15:17:57.077771Z"
+    },
+    {
+      "id": "test_task_a",
+      "type": "WATCH",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "unicorn",
+      "created_at": "2026-02-06T15:18:13.847787Z"
+    },
+    {
+      "id": "test_task_b",
+      "type": "CHAOS",
+      "target": "ai-ulu/qa-repo",
+      "priority": "high",
+      "impact": "high",
+      "category": "muscle",
+      "created_at": "2026-02-06T15:18:13.868221Z"
+    },
+    {
+      "id": "task_20260206151813929603",
+      "type": "REPAIR",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "muscle",
+      "created_at": "2026-02-06T15:18:13.930176Z"
     }
   ],
-  "in_progress": [],
+  "in_progress": [
+    {
+      "id": "pop_test",
+      "type": "WATCH",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "muscle",
+      "created_at": "2026-02-06T15:18:29.464958Z",
+      "started_at": "2026-02-06T15:18:29.487562Z"
+    }
+  ],
   "completed": [
     {
       "id": "task_001",
       "type": "REPAIR",
       "target": "ai-ulu/qa-repo",
       "priority": "high",
+      "impact": "high",
+      "category": "unicorn",
       "started_at": "2026-02-06T13:04:59.098175Z",
       "completed_at": "2026-02-06T13:04:59.221291Z",
       "result": "repair_dispatched"
@@ -31,6 +102,8 @@
       "type": "SELF_HEAL",
       "target": "RepairAgent",
       "priority": "high",
+      "impact": "high",
+      "category": "unicorn",
       "created_at": "2026-02-06T13:04:59.100216Z",
       "started_at": "2026-02-06T13:05:00.242810Z",
       "completed_at": "2026-02-06T13:05:00.314844Z",
@@ -41,6 +114,8 @@
       "type": "SELF_HEAL",
       "target": "system",
       "priority": "high",
+      "impact": "high",
+      "category": "unicorn",
       "created_at": "2026-02-06T13:18:21.849394Z",
       "started_at": "2026-02-06T13:18:21.865840Z",
       "completed_at": "2026-02-06T13:18:21.918990Z",
@@ -51,10 +126,48 @@
       "type": "SELF_HEAL",
       "target": "RepairAgent",
       "priority": "high",
+      "impact": "high",
+      "category": "unicorn",
       "created_at": "2026-02-06T13:51:40.804616Z",
       "started_at": "2026-02-06T13:51:40.891389Z",
       "completed_at": "2026-02-06T13:51:40.978669Z",
       "result": "self_heal_dispatched"
+    },
+    {
+      "id": "task_20260206151709107730",
+      "type": "WATCH",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "unicorn",
+      "created_at": "2026-02-06T15:17:09.107730Z",
+      "started_at": "2026-02-06T15:17:09.328610Z",
+      "completed_at": "2026-02-06T15:17:09.385297Z",
+      "result": "watch_dispatched"
+    },
+    {
+      "id": "task_20260206151709107730",
+      "type": "WATCH",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "unicorn",
+      "created_at": "2026-02-06T15:17:09.107730Z",
+      "started_at": "2026-02-06T15:17:57.341540Z",
+      "completed_at": "2026-02-06T15:17:57.367576Z",
+      "result": "cooldown"
+    },
+    {
+      "id": "task_20260206151757098591",
+      "type": "WATCH",
+      "target": "ai-ulu/qa-repo",
+      "priority": "normal",
+      "impact": "normal",
+      "category": "unicorn",
+      "created_at": "2026-02-06T15:17:57.098591Z",
+      "started_at": "2026-02-06T15:18:13.909026Z",
+      "completed_at": "2026-02-06T15:18:13.970843Z",
+      "result": "watch_dispatched"
     }
   ]
 }

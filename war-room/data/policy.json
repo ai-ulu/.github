@@ -1,0 +1,16 @@
+{
+  "rsi_pause_chaos_below": 95,
+  "prioritize_unicorn": true,
+  "defer_chaos_when_rsi_low": true,
+  "allow_idle_muscle_tasks": true,
+  "idle_tasks": [
+    {
+      "type": "REPAIR",
+      "priority": "low",
+      "impact": "low",
+      "category": "muscle",
+      "target": "ai-ulu/qa-repo",
+      "note": "docs/readme polish"
+    }
+  ]
+}
