@@ -38,8 +38,9 @@ class MatrixRain {
         this.ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Matrix green/cyan color
-        this.ctx.fillStyle = '#00f5ff';
+        // Matrix color (controlled by CSS variable)
+        const color = getComputedStyle(document.body).getPropertyValue('--matrix-color');
+        this.ctx.fillStyle = (color && color.trim()) ? color.trim() : '#00f5ff';
         this.ctx.font = `${this.fontSize}px monospace`;
 
         // Draw characters

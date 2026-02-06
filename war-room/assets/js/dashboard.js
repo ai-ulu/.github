@@ -6,6 +6,7 @@ class WarRoomDashboard {
         this.metricsUrl = 'data/metrics.json';
         this.agentLogUrl = 'data/agent-log.json';
         this.reposUrl = 'data/repos.json';
+        this.memoryUrl = 'data/agent_memory.json';
         this.updateInterval = 30000; // 30 seconds
 
         this.init();
@@ -18,11 +19,13 @@ class WarRoomDashboard {
         await this.loadMetrics();
         await this.loadAgentLog();
         await this.loadRepositories();
+        await this.checkPanic();
 
         // Set up auto-refresh
         setInterval(() => this.loadMetrics(), this.updateInterval);
         setInterval(() => this.loadAgentLog(), this.updateInterval);
         setInterval(() => this.loadRepositories(), this.updateInterval * 4); // Repos update less frequently
+        setInterval(() => this.checkPanic(), this.updateInterval);
 
         console.log('OK War Room Dashboard ready');
     }
@@ -244,6 +247,31 @@ class WarRoomDashboard {
                 second: '2-digit'
             });
             timeElement.textContent = timeString;
+        }
+    }
+
+    async checkPanic() {
+        try {
+            const response = await fetch(this.memoryUrl);
+            if (!response.ok) {
+                this.setPanicMode(false);
+                return;
+            }
+            const data = await response.json();
+            this.setPanicMode(Boolean(data.panic_status));
+        } catch (error) {
+            console.warn('Panic check failed:', error);
+            this.setPanicMode(false);
+        }
+    }
+
+    setPanicMode(enabled) {
+        const body = document.body;
+        if (!body) return;
+        if (enabled) {
+            body.classList.add('panic-mode');
+        } else {
+            body.classList.remove('panic-mode');
         }
     }
 }

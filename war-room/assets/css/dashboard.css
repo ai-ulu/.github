@@ -25,10 +25,16 @@
     --glow-purple: 0 0 20px rgba(178, 75, 243, 0.5);
     --glow-cyan: 0 0 20px rgba(0, 245, 255, 0.5);
     --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+
+    --matrix-color: #00f5ff;
     
     /* Fonts */
     --font-display: 'Orbitron', sans-serif;
     --font-body: 'Rajdhani', sans-serif;
+}
+
+body.panic-mode {
+    --matrix-color: #ff0000;
 }
 
 * {

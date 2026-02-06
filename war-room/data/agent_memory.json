@@ -1,0 +1,10 @@
+{
+  "activities": [],
+  "stats": {
+    "repairs": 0,
+    "total_time": 0.0
+  },
+  "panic_status": false,
+  "panic_reason": null,
+  "panic_at": null
+}

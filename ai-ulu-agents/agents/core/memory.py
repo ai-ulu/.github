@@ -14,7 +14,13 @@ class AgentMemory:
             os.makedirs(os.path.dirname(self.storage_path), exist_ok=True)
             with open(self.storage_path, "w", encoding="utf-8") as f:
                 json.dump(
-                    {"activities": [], "stats": {"repairs": 0, "total_time": 0.0}},
+                    {
+                        "activities": [],
+                        "stats": {"repairs": 0, "total_time": 0.0},
+                        "panic_status": False,
+                        "panic_reason": None,
+                        "panic_at": None,
+                    },
                     f,
                     indent=2,
                 )
@@ -55,6 +61,23 @@ class AgentMemory:
         data["last_repair_at"] = datetime.utcnow().isoformat() + "Z"
         self._write(data)
 
+    def set_panic(self, status: bool, reason: str) -> None:
+        data = self._read()
+        data["panic_status"] = bool(status)
+        data["panic_reason"] = reason
+        data["panic_at"] = datetime.utcnow().isoformat() + "Z" if status else None
+        if status:
+            data["activities"].insert(
+                0,
+                {
+                    "icon": "[ALARM]",
+                    "text": f"PANIC: {reason}",
+                    "time": "Just now",
+                },
+            )
+            data["activities"] = data["activities"][:10]
+        self._write(data)
+
     def get_dashboard_stats(self) -> Dict[str, Any]:
         data = self._read()
         stats = data.get("stats", {})
@@ -66,4 +89,7 @@ class AgentMemory:
             "total_time": total_time,
             "mttr_est": mttr,
             "last_repair_at": data.get("last_repair_at"),
+            "panic_status": data.get("panic_status", False),
+            "panic_reason": data.get("panic_reason"),
+            "panic_at": data.get("panic_at"),
         }
