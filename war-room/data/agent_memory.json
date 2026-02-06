@@ -2,6 +2,26 @@
   "activities": [
     {
       "icon": "[HEAL]",
+      "text": "Orchestrator: Dispatched self-heal (task task_605f75ff)",
+      "time": "Just now"
+    },
+    {
+      "icon": "[+]",
+      "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: RepairAgent: panic_test -> error: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[ALARM]",
+      "text": "PANIC: RepairAgent failed during panic_test: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[HEAL]",
       "text": "Orchestrator: Dispatched self-heal (task task_20260206131821848390)",
       "time": "Just now"
     },
@@ -29,26 +49,6 @@
       "icon": "[REPAIR]",
       "text": "Orchestrator: Dispatched repair to ai-ulu/qa-repo (task task_001)",
       "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "RepairAgent: Detected dependency issue in ai-ulu/qa-repo: queued repair",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "RepairAgent: RepairAgent: panic_test -> error: Simulated repair failure",
-      "time": "Just now"
-    },
-    {
-      "icon": "[ALARM]",
-      "text": "PANIC: RepairAgent failed during panic_test: Simulated repair failure",
-      "time": "Just now"
-    },
-    {
-      "icon": "[+]",
-      "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
-      "time": "Just now"
     }
   ],
   "stats": {
@@ -59,22 +59,29 @@
       4.1,
       2.7
     ],
-    "operations": 5,
+    "operations": 6,
     "ops_window": [
       1,
       1,
       1,
       0,
+      0,
       0
     ],
-    "panic_count": 3,
-    "panic_resolved": 3,
+    "panic_count": 4,
+    "panic_resolved": 4,
     "agent_stats": {
       "repair_agent": {
         "success": 0,
         "failure": 2,
         "last_run": "2026-02-06T13:38:30.998716Z",
         "backoff_level": 2
+      },
+      "self_healing_agent": {
+        "success": 1,
+        "failure": 0,
+        "last_run": "2026-02-06T13:51:40.957148Z",
+        "backoff_level": 0
       }
     }
   },

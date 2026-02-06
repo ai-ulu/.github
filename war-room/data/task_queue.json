@@ -30,6 +30,16 @@
       "started_at": "2026-02-06T13:18:21.865840Z",
       "completed_at": "2026-02-06T13:18:21.918990Z",
       "result": "self_heal_dispatched"
+    },
+    {
+      "id": "task_605f75ff",
+      "type": "SELF_HEAL",
+      "target": "RepairAgent",
+      "priority": "high",
+      "created_at": "2026-02-06T13:51:40.804616Z",
+      "started_at": "2026-02-06T13:51:40.891389Z",
+      "completed_at": "2026-02-06T13:51:40.978669Z",
+      "result": "self_heal_dispatched"
     }
   ]
 }
