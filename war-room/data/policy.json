@@ -77,6 +77,22 @@
         "WATCH"
       ],
       "chaos_allowed": true
+    },
+    "ai-ulu/babysteps": {
+      "class": "archive",
+      "priority_weight": 0.2,
+      "allowed_agents": [
+        "WATCH"
+      ],
+      "chaos_allowed": false
+    },
+    "ai-ulu/nisanproclean": {
+      "class": "archive",
+      "priority_weight": 0.2,
+      "allowed_agents": [
+        "WATCH"
+      ],
+      "chaos_allowed": false
     }
   },
   "idle_tasks": [
