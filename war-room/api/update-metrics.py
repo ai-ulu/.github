@@ -291,13 +291,51 @@ def main():
         def avg(values):
             return round(sum(values) / len(values), 2) if values else 0
 
+        # Strategic advice engine (V2)
+        suggestions = [
+            {
+                "id": "market_analyser",
+                "en": "System strong. Next move: launch 'ulu-market-analyser' to track external trends.",
+                "tr": "Sistem guclu. Siradaki hamle: dis trendleri izlemek icin 'ulu-market-analyser' reposu ac.",
+            },
+            {
+                "id": "docs_automation",
+                "en": "Repo mix is unbalanced. Recommend 'ulu-docs-automation' to reduce docs load.",
+                "tr": "Repo dagilimi dengesiz. Dokumantasyon yukunu azaltmak icin 'ulu-docs-automation' onerilir.",
+            },
+            {
+                "id": "api_gateway",
+                "en": "Aura is rising. Build 'ulu-api-gateway' to open the ecosystem to third parties.",
+                "tr": "Aura yukseliyor. Ekosistemi disari acmak icin 'ulu-api-gateway' kur.",
+            },
+            {
+                "id": "quality_reinforcement",
+                "en": "RSI is low. Focus on quality and stabilize core repos before expansion.",
+                "tr": "RSI dusuk. Genislemeden once cekirdek repolari stabilize et.",
+            },
+        ]
+
+        total = max(1, sum(class_counts.values()))
+        unicorn_ratio = class_counts.get('unicorn', 0) / total
+        archive_ratio = class_counts.get('archive', 0) / total
+
+        if rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)):
+            advice_pick = suggestions[3]
+        elif archive_ratio > 0.3:
+            advice_pick = suggestions[1]
+        elif unicorn_ratio >= 0.6:
+            advice_pick = suggestions[2]
+        else:
+            advice_pick = suggestions[0]
+
         dashboard_data = {
             'class_counts': class_counts,
             'class_avg_aura': {k: avg(v) for k, v in class_aura.items()},
             'premium_ratio': (
                 round(class_counts.get('unicorn', 0) / max(1, sum(class_counts.values())), 2)
             ),
-            'advice': 'RSI low: chaos deferred' if rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)) else 'Stable: chaos allowed',
+            'advice_en': advice_pick['en'],
+            'advice_tr': advice_pick['tr'],
             'policy_last_update': datetime.now().isoformat()
         }
 

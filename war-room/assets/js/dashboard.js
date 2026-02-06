@@ -467,7 +467,9 @@ class WarRoomDashboard {
                 premiumNote.textContent = 'Unicorn / Total';
             }
             if (adviceText) {
-                adviceText.textContent = data.advice || '--';
+                adviceText.textContent = this.lang === 'tr'
+                    ? (data.advice_tr || '--')
+                    : (data.advice_en || '--');
             }
 
             this.renderDistributionChart(data.class_counts || {});

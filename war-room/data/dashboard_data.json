@@ -10,6 +10,7 @@
     "archive": 0
   },
   "premium_ratio": 0.71,
-  "advice": "RSI low: chaos deferred",
-  "policy_last_update": "2026-02-06T23:12:34.962875"
+  "advice_en": "RSI is low. Focus on quality and stabilize core repos before expansion.",
+  "advice_tr": "RSI dusuk. Genislemeden once cekirdek repolari stabilize et.",
+  "policy_last_update": "2026-02-06T23:20:31.233213"
 }
