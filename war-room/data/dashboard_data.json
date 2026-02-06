@@ -2,17 +2,18 @@
   "class_counts": {
     "unicorn": 5,
     "muscle": 0,
-    "archive": 2
+    "archive": 4
   },
   "class_avg_aura": {
     "unicorn": 0,
     "muscle": 0,
     "archive": 0
   },
-  "premium_ratio": 0.71,
+  "premium_ratio": 0.56,
   "advice_en": "RSI is low. Focus on quality and stabilize core repos before expansion.",
   "advice_tr": "RSI dusuk. Genislemeden once cekirdek repolari stabilize et.",
   "cognitive_depth": 0,
   "cortex_recent": [],
-  "policy_last_update": "2026-02-06T23:30:31.032555"
+  "cognitive_threshold": 50.0,
+  "policy_last_update": "2026-02-07T01:22:09.685192"
 }
