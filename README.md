@@ -20,6 +20,30 @@ After the next workflow run, the dashboard will be available at:
 Local preview:
 `war-room/index.html`
 
+### What The War Room Shows
+- Autonomous Operation Rate (AOR)
+- Resilience Stability Index (RSI)
+- Mean Time To Repair (MTTR)
+- Live Agent Activity feed
+- Repository Health Matrix
+- Chaos status and queue indicators
+
+### Data Sources
+- `war-room/data/metrics.json` (AOR/RSI/MTTR + chaos stats)
+- `war-room/data/agent-log.json` (activity feed)
+- `war-room/data/repos.json` (repo health)
+- `war-room/data/agent_memory.json` (panic + agent stats)
+- `war-room/data/task_queue.json` (queue state)
+
+### Workflow That Publishes Pages
+- Workflow: `Deploy War Room Dashboard` (`.github/workflows/deploy-war-room.yml`)
+- Triggers: push to `main` with `war-room/**` changes, schedule every 15 minutes, or manual dispatch.
+
+### How To Verify It Is Up To Date
+1. Open **Actions** tab in GitHub and check the latest `Deploy War Room Dashboard` run.
+2. Confirm the run completed successfully.
+3. Refresh `https://ai-ulu.github.io` and check timestamps/metrics.
+
 ## Centralized CI/CD
 All repositories in the organization use the reusable pipeline defined in `.github/workflows/pipeline.yml`. This ensures:
 - Consistent quality checks across 36+ repos.
