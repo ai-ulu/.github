@@ -171,13 +171,27 @@ class AgentMemory:
         data = self._read()
         stats = data.setdefault("stats", {})
         agent_stats = stats.setdefault("agent_stats", {})
-        entry = agent_stats.setdefault(agent_id, {"success": 0, "failure": 0, "last_run": None})
+        entry = agent_stats.setdefault(
+            agent_id,
+            {"success": 0, "failure": 0, "last_run": None, "backoff_level": 0},
+        )
         if success:
             entry["success"] = int(entry.get("success", 0)) + 1
+            entry["backoff_level"] = 0
         else:
             entry["failure"] = int(entry.get("failure", 0)) + 1
+            entry["backoff_level"] = int(entry.get("backoff_level", 0)) + 1
         entry["last_run"] = datetime.utcnow().isoformat() + "Z"
         self._write(data)
+
+    def get_backoff_seconds(self, agent_id: str, base_seconds: int) -> int:
+        data = self._read()
+        stats = data.get("stats", {})
+        entry = stats.get("agent_stats", {}).get(agent_id, {})
+        level = int(entry.get("backoff_level", 0))
+        if level <= 0:
+            return base_seconds
+        return base_seconds * (2 ** min(level, 4))
 
     def get_dashboard_stats(self) -> Dict[str, Any]:
         data = self._read()

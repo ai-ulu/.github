@@ -1,5 +1,7 @@
 {
   "repos": [
-    "ai-ulu/qa-repo"
+    "ai-ulu/qa-repo",
+    "ai-ulu/*",
+    "*-dev"
   ]
 }

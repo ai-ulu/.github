@@ -68,7 +68,15 @@
       0
     ],
     "panic_count": 3,
-    "panic_resolved": 3
+    "panic_resolved": 3,
+    "agent_stats": {
+      "repair_agent": {
+        "success": 0,
+        "failure": 2,
+        "last_run": "2026-02-06T13:38:30.998716Z",
+        "backoff_level": 2
+      }
+    }
   },
   "panic_status": false,
   "panic_reason": "System restored by SelfHealingAgent",

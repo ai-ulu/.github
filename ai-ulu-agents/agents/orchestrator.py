@@ -36,7 +36,19 @@ class Orchestrator(BaseAgent):
         allowed = data.get("repos", [])
         if not allowed:
             return True
-        return target in allowed
+        for rule in allowed:
+            rule = rule.strip()
+            if not rule:
+                continue
+            if rule.endswith("*"):
+                prefix = rule[:-1]
+                if target.startswith(prefix):
+                    return True
+            if rule.startswith("*") and target.endswith(rule[1:]):
+                return True
+            if target == rule:
+                return True
+        return False
 
     def dispatch(self, task):
         task_type = (task.get("type") or "").upper()
@@ -44,9 +56,14 @@ class Orchestrator(BaseAgent):
         target = task.get("target", "unknown")
         agent_cfg = self.registry.get_agent_config_for_task(task_type)
         agent_id = agent_cfg.get("agent_id", "unknown")
-        cooldown = int(agent_cfg.get("cooldown_seconds", 0))
+        base_cooldown = int(agent_cfg.get("cooldown_seconds", 0))
+        cooldown = self.memory.get_backoff_seconds(agent_id, base_cooldown)
         if not self.memory.can_run(agent_id, cooldown):
-            self.log_activity(f"Cooldown active for {agent_id}", icon="[WAIT]", task_id=task_id)
+            self.log_activity(
+                f"Cooldown active for {agent_id} ({cooldown}s)",
+                icon="[WAIT]",
+                task_id=task_id,
+            )
             return "cooldown"
         if task_type == "REPAIR":
             if not self._is_allowed(target):
