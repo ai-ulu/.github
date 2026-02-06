@@ -46,14 +46,17 @@ def load_agent_memory():
         return json.load(f)
 
 def calculate_rsi_from_memory(memory):
-    """Calculate Resilience Stability Index from agent memory"""
+    """Calculate RSI from recent ops with recovery bonus"""
     stats = memory.get("stats", {})
-    operations = int(stats.get("operations", 0))
+    ops_window = list(stats.get("ops_window", []))
     panic_count = int(stats.get("panic_count", 0))
-    total = operations + panic_count
-    if total == 0:
-        return 0.0
-    return round((operations / total) * 100, 2)
+    panic_resolved = int(stats.get("panic_resolved", 0))
+    total_ops = len(ops_window)
+    ops_success = sum(ops_window)
+    success_rate = (ops_success / total_ops) * 100 if total_ops > 0 else 0.0
+    recovery_bonus = (panic_resolved / max(1, panic_count)) * 5 if panic_count > 0 else 0.0
+    rsi = success_rate + recovery_bonus
+    return min(99.9, round(rsi, 1))
 
 def calculate_mttr_from_memory(memory):
     """Calculate Mean Time To Repair from agent memory"""

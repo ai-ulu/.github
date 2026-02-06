@@ -21,6 +21,7 @@ class AgentMemory:
                             "total_time": 0.0,
                             "repair_times": [],
                             "operations": 0,
+                            "ops_window": [],
                             "panic_count": 0,
                             "panic_resolved": 0,
                         },
@@ -41,12 +42,17 @@ class AgentMemory:
             json.dump(data, f, indent=2)
 
     def record_event(self, agent_name: str, action: str, result: str) -> None:
-        icon = "[OK]" if result.lower() in {"ok", "success", "fixed"} else "[WARN]"
+        result_lower = result.lower()
+        is_success = result_lower in {"ok", "success", "fixed"}
+        icon = "[OK]" if is_success else "[WARN]"
         text = f"{agent_name}: {action} -> {result}"
         self.record_activity(agent_name, text, icon=icon)
         data = self._read()
         stats = data.setdefault("stats", {})
         stats["operations"] = int(stats.get("operations", 0)) + 1
+        ops_window = list(stats.get("ops_window", []))
+        ops_window.append(1 if is_success else 0)
+        stats["ops_window"] = ops_window[-20:]
         self._write(data)
 
     def record_activity(self, agent_name: str, text: str, icon: str = "[#]") -> None:
@@ -105,6 +111,7 @@ class AgentMemory:
         total_time = float(stats.get("total_time", 0.0))
         repair_times = list(stats.get("repair_times", []))
         operations = int(stats.get("operations", 0))
+        ops_window = list(stats.get("ops_window", []))
         panic_count = int(stats.get("panic_count", 0))
         panic_resolved = int(stats.get("panic_resolved", 0))
         mttr = (
@@ -114,17 +121,20 @@ class AgentMemory:
             if repairs > 0
             else 0.0
         )
-        rsi = (
-            round((operations / (operations + panic_count)) * 100, 2)
-            if operations + panic_count > 0
-            else 0.0
+        total_ops = len(ops_window)
+        ops_success = sum(ops_window)
+        success_rate = (ops_success / total_ops) * 100 if total_ops > 0 else 0.0
+        recovery_bonus = (
+            (panic_resolved / max(1, panic_count)) * 5 if panic_count > 0 else 0.0
         )
+        rsi = min(99.9, round(success_rate + recovery_bonus, 1))
         return {
             "repairs": repairs,
             "total_time": total_time,
             "mttr": mttr,
             "rsi": rsi,
             "operations": operations,
+            "ops_window": ops_window,
             "panic_count": panic_count,
             "panic_resolved": panic_resolved,
             "panic_status": data.get("panic_status", False),

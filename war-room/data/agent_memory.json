@@ -40,6 +40,12 @@
       2.7
     ],
     "operations": 4,
+    "ops_window": [
+      1,
+      1,
+      1,
+      0
+    ],
     "panic_count": 1,
     "panic_resolved": 1
   },
