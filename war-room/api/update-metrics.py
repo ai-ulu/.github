@@ -328,6 +328,28 @@ def main():
         else:
             advice_pick = suggestions[0]
 
+        # Cortex metrics
+        cortex_path = os.path.join('war-room', 'data', 'cortex_log.json')
+        cortex_entries = []
+        if os.path.exists(cortex_path):
+            try:
+                with open(cortex_path, 'r', encoding='utf-8') as cf:
+                    cortex_entries = json.load(cf).get('entries', [])
+            except (OSError, json.JSONDecodeError):
+                cortex_entries = []
+
+        recent_scores = [e.get('score', 0) for e in cortex_entries[:10] if isinstance(e.get('score', 0), (int, float))]
+        cognitive_depth = round(sum(recent_scores) / len(recent_scores), 2) if recent_scores else 0
+        cortex_tail = [
+            {
+                'task_type': e.get('task_type'),
+                'target': e.get('target'),
+                'score': e.get('score'),
+                'created_at': e.get('created_at'),
+            }
+            for e in cortex_entries[:3]
+        ]
+
         dashboard_data = {
             'class_counts': class_counts,
             'class_avg_aura': {k: avg(v) for k, v in class_aura.items()},
@@ -336,6 +358,8 @@ def main():
             ),
             'advice_en': advice_pick['en'],
             'advice_tr': advice_pick['tr'],
+            'cognitive_depth': cognitive_depth,
+            'cortex_recent': cortex_tail,
             'policy_last_update': datetime.now().isoformat()
         }
 

@@ -46,6 +46,8 @@ class WarRoomDashboard {
                 chart_power: 'Aura Power Meter',
                 premium_indicator: 'Premium Indicator',
                 strategic_advice: 'Strategic Advice'
+                ,cortex_depth: 'Cognitive Depth'
+                ,cortex_recent: 'Recent Cortex Decisions'
             },
             tr: {
                 tagline: 'Otonom Ajan Mühendisligi - Canli Misyon Kontrol',
@@ -81,6 +83,8 @@ class WarRoomDashboard {
                 chart_power: 'Aura Guc Olceri',
                 premium_indicator: 'Premium Gosterge',
                 strategic_advice: 'Stratejik Tavsiye'
+                ,cortex_depth: 'Bilissel Derinlik'
+                ,cortex_recent: 'Son Cortex Kararlari'
             }
         };
         this.lang = this.getDefaultLanguage();
@@ -455,6 +459,9 @@ class WarRoomDashboard {
         const premiumValue = document.getElementById('premium-value');
         const premiumNote = document.getElementById('premium-note');
         const adviceText = document.getElementById('advice-text');
+        const cortexFill = document.getElementById('cortex-fill');
+        const cortexValue = document.getElementById('cortex-value');
+        const cortexLog = document.getElementById('cortex-log');
         try {
             const response = await fetch(this.dashboardDataUrl);
             if (!response.ok) return;
@@ -474,6 +481,20 @@ class WarRoomDashboard {
 
             this.renderDistributionChart(data.class_counts || {});
             this.renderPowerChart(data.class_avg_aura || {});
+
+            const depth = Math.max(0, Math.min(100, Math.round((data.cognitive_depth || 0) * 10)));
+            if (cortexFill) cortexFill.style.width = `${depth}%`;
+            if (cortexValue) cortexValue.textContent = `${depth}%`;
+            if (cortexLog) {
+                const recent = data.cortex_recent || [];
+                if (!recent.length) {
+                    cortexLog.innerHTML = `<li>${this.translations[this.lang].classify_empty}</li>`;
+                } else {
+                    cortexLog.innerHTML = recent
+                        .map((e) => `<li>${e.task_type} ${e.target} (score ${e.score})</li>`)
+                        .join('');
+                }
+            }
         } catch (error) {
             // noop
         }
