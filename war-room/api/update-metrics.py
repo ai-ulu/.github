@@ -11,7 +11,7 @@ from github import Github
 
 def get_github_client():
     """Initialize GitHub client with token"""
-    token = os.getenv('GITHUB_TOKEN')
+    token = os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
     if not token:
         return None
     return Github(token)
