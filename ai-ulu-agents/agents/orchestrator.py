@@ -10,6 +10,8 @@ from .core.task_queue import TaskQueue
 from .core.registry import AgentRegistry
 from .repair_agent import RepairAgent
 from .self_healing_agent import SelfHealingAgent
+from .chaos_monkey import ChaosMonkey
+from .watcher import Watcher
 
 
 class Orchestrator(BaseAgent):
@@ -75,6 +77,21 @@ class Orchestrator(BaseAgent):
             self.log_activity(f"Dispatched repair to {target}", icon="[REPAIR]", task_id=task_id)
             self.memory.record_agent_result(agent_id, True)
             return "repair_dispatched"
+        if task_type == "CHAOS":
+            agent = ChaosMonkey(memory=self.memory, queue=self.queue)
+            scenario = task.get("scenario", "dependency_corruption")
+            agent.log_activity(f"Chaos run simulated: {scenario} on {target}", icon="[CHAOS]", task_id=task_id)
+            self.memory.record_agent_result(agent_id, True)
+            return "chaos_simulated"
+        if task_type == "WATCH":
+            agent = Watcher(memory=self.memory, queue=self.queue)
+            package = task.get("package", "unknown")
+            note = task.get("note", "update check")
+            agent.log_activity(f"Watcher flagged {package} for {target}: {note}", icon="[WATCH]", task_id=task_id)
+            # Optional: turn watch event into repair task for repo
+            self.queue.enqueue({"type": "REPAIR", "target": target, "priority": "normal"})
+            self.memory.record_agent_result(agent_id, True)
+            return "watch_dispatched"
         if task_type == "SELF_HEAL":
             agent = SelfHealingAgent(memory=self.memory)
             metrics = self.memory.get_sync_metrics()

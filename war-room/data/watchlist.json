@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "repo": "ai-ulu/qa-repo",
+      "package": "requests",
+      "priority": "normal",
+      "note": "security update check"
+    }
+  ]
+}

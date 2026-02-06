@@ -59,6 +59,10 @@ and aligned with the current repo layout.
 - Load-aware dispatch (cooldown / success rate).
 - Multi-repo routing and allowlist policies.
 
+### Phase 6: Intelligence Agents (In Progress)
+- Chaos Monkey (stress testing).
+- Watcher (dependency update signal).
+
 ## Runbook (Local)
 
 ### Simulate panic + auto-heal
