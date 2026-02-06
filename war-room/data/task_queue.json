@@ -1,12 +1,25 @@
 {
-  "pending": [
+  "pending": [],
+  "in_progress": [],
+  "completed": [
     {
       "id": "task_001",
       "type": "REPAIR",
       "target": "ai-ulu/qa-repo",
-      "priority": "high"
+      "priority": "high",
+      "started_at": "2026-02-06T13:04:59.098175Z",
+      "completed_at": "2026-02-06T13:04:59.221291Z",
+      "result": "repair_dispatched"
+    },
+    {
+      "id": "task_23cd43d0",
+      "type": "SELF_HEAL",
+      "target": "RepairAgent",
+      "priority": "high",
+      "created_at": "2026-02-06T13:04:59.100216Z",
+      "started_at": "2026-02-06T13:05:00.242810Z",
+      "completed_at": "2026-02-06T13:05:00.314844Z",
+      "result": "self_heal_dispatched"
     }
-  ],
-  "in_progress": [],
-  "completed": []
+  ]
 }

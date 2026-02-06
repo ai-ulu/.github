@@ -1,6 +1,36 @@
 {
   "activities": [
     {
+      "icon": "[HEAL]",
+      "text": "Orchestrator: Dispatched self-heal (task task_23cd43d0)",
+      "time": "Just now"
+    },
+    {
+      "icon": "[+]",
+      "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[REPAIR]",
+      "text": "Orchestrator: Dispatched repair to ai-ulu/qa-repo (task task_001)",
+      "time": "Just now"
+    },
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: Detected dependency issue in ai-ulu/qa-repo: queued repair",
+      "time": "Just now"
+    },
+    {
+      "icon": "[WARN]",
+      "text": "RepairAgent: RepairAgent: panic_test -> error: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
+      "icon": "[ALARM]",
+      "text": "PANIC: RepairAgent failed during panic_test: Simulated repair failure",
+      "time": "Just now"
+    },
+    {
       "icon": "[+]",
       "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
       "time": "Just now"
@@ -19,16 +49,6 @@
       "icon": "[WARN]",
       "text": "RepairAgent: RepairAgent: Fixed issue in repo-c -> Resolved lockfile mismatch",
       "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "RepairAgent: RepairAgent: Fixed issue in repo-b -> Fixed CI cache issue",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "RepairAgent: RepairAgent: Fixed issue in repo-a -> Just fixed a dependency bug!",
-      "time": "Just now"
     }
   ],
   "stats": {
@@ -39,15 +59,16 @@
       4.1,
       2.7
     ],
-    "operations": 4,
+    "operations": 5,
     "ops_window": [
       1,
       1,
       1,
+      0,
       0
     ],
-    "panic_count": 1,
-    "panic_resolved": 1
+    "panic_count": 2,
+    "panic_resolved": 2
   },
   "panic_status": false,
   "panic_reason": "System restored by SelfHealingAgent",
