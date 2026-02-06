@@ -9,12 +9,71 @@ class WarRoomDashboard {
         this.memoryUrl = 'data/agent_memory.json';
         this.queueUrl = 'data/task_queue.json';
         this.updateInterval = 30000; // 30 seconds
+        this.translations = {
+            en: {
+                tagline: 'Autonomous Agentic Engineering - Live Mission Control',
+                status_operational: 'SYSTEM OPERATIONAL',
+                label_aor: 'Autonomous Operation Rate',
+                label_rsi: 'Resilience Stability Index',
+                label_mttr: 'Mean Time To Repair',
+                label_repos: 'Active Repositories',
+                section_activity: 'Live Agent Activity',
+                queue_status: 'Queue: {pending} pending, {active} active',
+                last_update: 'Last update:',
+                queue_title: 'Next Tasks',
+                loading: 'Loading...',
+                feed_init: 'Initializing agent feed...',
+                section_repo: 'Repository Health Matrix',
+                legend_excellent: 'Excellent',
+                legend_good: 'Good',
+                legend_fair: 'Fair',
+                legend_poor: 'Poor',
+                repos_loading: 'Loading repositories...',
+                section_chaos: 'Chaos Engineering Status',
+                chaos_last: 'Last Chaos Test',
+                chaos_success: 'Recovery Success Rate',
+                chaos_scenarios: 'Scenarios Executed',
+                footer_line: '(c) 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem',
+                footer_tagline: '"Not a framework. Not a platform. An Operating System for AI."',
+                queue_empty: 'empty'
+            },
+            tr: {
+                tagline: 'Otonom Ajan Mühendisligi - Canli Misyon Kontrol',
+                status_operational: 'SISTEM AKTIF',
+                label_aor: 'Otonom Operasyon Orani',
+                label_rsi: 'Dayaniklilik Stabilite Indeksi',
+                label_mttr: 'Onarim Ortalama Suresi',
+                label_repos: 'Aktif Depolar',
+                section_activity: 'Canli Ajan Aktivitesi',
+                queue_status: 'Kuyruk: {pending} bekleyen, {active} aktif',
+                last_update: 'Son guncelleme:',
+                queue_title: 'Siradaki Gorevler',
+                loading: 'Yukleniyor...',
+                feed_init: 'Ajan akisi baslatiliyor...',
+                section_repo: 'Depo Saglik Matrisi',
+                legend_excellent: 'Mukemmel',
+                legend_good: 'Iyi',
+                legend_fair: 'Orta',
+                legend_poor: 'Zayif',
+                repos_loading: 'Depolar yukleniyor...',
+                section_chaos: 'Kaos Muhendisligi Durumu',
+                chaos_last: 'Son Kaos Testi',
+                chaos_success: 'Kurtarma Basari Orani',
+                chaos_scenarios: 'Calistirilan Senaryolar',
+                footer_line: '(c) 2026 ai-ulu | Otonom Ajan Muhendisligi Ekosistemi',
+                footer_tagline: '"Bir framework degil. Bir platform degil. AI icin bir Isletim Sistemi."',
+                queue_empty: 'bos'
+            }
+        };
+        this.lang = this.getDefaultLanguage();
 
         this.init();
     }
 
     async init() {
         console.log(' War Room Dashboard initializing...');
+        this.applyTranslations();
+        this.bindLanguageToggle();
 
         // Load initial data
         await this.loadMetrics();
@@ -31,6 +90,46 @@ class WarRoomDashboard {
         setInterval(() => this.loadQueueStatus(), this.updateInterval);
 
         console.log('OK War Room Dashboard ready');
+    }
+
+    getDefaultLanguage() {
+        const stored = localStorage.getItem('war_room_lang');
+        if (stored) return stored;
+        return navigator.language && navigator.language.startsWith('tr') ? 'tr' : 'en';
+    }
+
+    setLanguage(lang) {
+        this.lang = this.translations[lang] ? lang : 'en';
+        localStorage.setItem('war_room_lang', this.lang);
+        document.documentElement.setAttribute('lang', this.lang);
+        this.applyTranslations();
+        this.loadQueueStatus();
+        this.updateLastUpdateTime();
+    }
+
+    bindLanguageToggle() {
+        const buttons = document.querySelectorAll('.lang-btn');
+        buttons.forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.lang === this.lang);
+            btn.addEventListener('click', () => {
+                const next = btn.dataset.lang || 'en';
+                this.setLanguage(next);
+                buttons.forEach((b) => b.classList.toggle('active', b.dataset.lang === next));
+            });
+        });
+    }
+
+    applyTranslations() {
+        const dict = this.translations[this.lang] || this.translations.en;
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+            const key = el.getAttribute('data-i18n');
+            if (!key || !dict[key]) return;
+            if (key === 'last_update') {
+                el.innerHTML = `${dict[key]} <span id="last-update-time">--</span>`;
+                return;
+            }
+            el.textContent = dict[key];
+        });
     }
 
     async loadMetrics() {
@@ -244,7 +343,7 @@ class WarRoomDashboard {
         const timeElement = document.getElementById('last-update-time');
         if (timeElement) {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {
+            const timeString = now.toLocaleTimeString(this.lang === 'tr' ? 'tr-TR' : 'en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
@@ -257,21 +356,26 @@ class WarRoomDashboard {
         const statusEl = document.getElementById('queue-status');
         const listEl = document.getElementById('queue-list');
         if (!statusEl) return;
+        const dict = this.translations[this.lang] || this.translations.en;
         try {
             const response = await fetch(this.queueUrl);
             if (!response.ok) {
-                statusEl.textContent = 'Queue: --';
+                statusEl.textContent = dict.queue_status
+                    .replace('{pending}', '--')
+                    .replace('{active}', '--');
                 if (listEl) listEl.innerHTML = '<li>--</li>';
                 return;
             }
             const data = await response.json();
             const pending = (data.pending || []).length;
             const inProgress = (data.in_progress || []).length;
-            statusEl.textContent = `Queue: ${pending} pending, ${inProgress} active`;
+            statusEl.textContent = dict.queue_status
+                .replace('{pending}', pending)
+                .replace('{active}', inProgress);
             if (listEl) {
                 const items = (data.pending || []).slice(0, 3);
                 if (items.length === 0) {
-                    listEl.innerHTML = '<li>empty</li>';
+                    listEl.innerHTML = `<li>${dict.queue_empty}</li>`;
                 } else {
                     listEl.innerHTML = items
                         .map((task) => {
@@ -283,7 +387,9 @@ class WarRoomDashboard {
                 }
             }
         } catch (error) {
-            statusEl.textContent = 'Queue: --';
+            statusEl.textContent = dict.queue_status
+                .replace('{pending}', '--')
+                .replace('{active}', '--');
             if (listEl) listEl.innerHTML = '<li>--</li>';
         }
     }

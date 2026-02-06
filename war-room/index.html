@@ -25,10 +25,14 @@
                 <span class="logo-icon">HQ</span>
                 <h1>ai-ulu <span class="highlight">War Room</span></h1>
             </div>
-            <p class="tagline">Autonomous Agentic Engineering - Live Mission Control</p>
+            <p class="tagline" data-i18n="tagline">Autonomous Agentic Engineering - Live Mission Control</p>
             <div class="status-indicator">
                 <span class="pulse"></span>
-                <span class="status-text">SYSTEM OPERATIONAL</span>
+                <span class="status-text" data-i18n="status_operational">SYSTEM OPERATIONAL</span>
+            </div>
+            <div class="lang-toggle">
+                <button class="lang-btn" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="tr">TR</button>
             </div>
         </header>
 
@@ -37,7 +41,7 @@
             <div class="metric-card aor">
                 <div class="metric-icon">AOR</div>
                 <div class="metric-content">
-                    <span class="metric-label">Autonomous Operation Rate</span>
+                    <span class="metric-label" data-i18n="label_aor">Autonomous Operation Rate</span>
                     <div class="metric-value-container">
                         <span class="metric-value" id="aor-value">--</span>
                         <span class="metric-unit">%</span>
@@ -51,7 +55,7 @@
             <div class="metric-card rsi">
                 <div class="metric-icon">RSI</div>
                 <div class="metric-content">
-                    <span class="metric-label">Resilience Stability Index</span>
+                    <span class="metric-label" data-i18n="label_rsi">Resilience Stability Index</span>
                     <div class="metric-value-container">
                         <span class="metric-value" id="rsi-value">--</span>
                         <span class="metric-unit">%</span>
@@ -65,7 +69,7 @@
             <div class="metric-card mttr">
                 <div class="metric-icon">MTTR</div>
                 <div class="metric-content">
-                    <span class="metric-label">Mean Time To Repair</span>
+                    <span class="metric-label" data-i18n="label_mttr">Mean Time To Repair</span>
                     <div class="metric-value-container">
                         <span class="metric-value" id="mttr-value">--</span>
                         <span class="metric-unit">min</span>
@@ -79,7 +83,7 @@
             <div class="metric-card repos">
                 <div class="metric-icon">REPOS</div>
                 <div class="metric-content">
-                    <span class="metric-label">Active Repositories</span>
+                    <span class="metric-label" data-i18n="label_repos">Active Repositories</span>
                     <div class="metric-value-container">
                         <span class="metric-value" id="repos-value">--</span>
                         <span class="metric-unit"></span>
@@ -94,20 +98,20 @@
         <!-- Live Agent Feed -->
         <section class="agent-feed">
             <div class="section-header">
-                <h2>Live Agent Activity</h2>
-                <span class="queue-status" id="queue-status">Queue: --</span>
-                <span class="last-update">Last update: <span id="last-update-time">--</span></span>
+                <h2 data-i18n="section_activity">Live Agent Activity</h2>
+                <span class="queue-status" id="queue-status" data-i18n="queue_status">Queue: --</span>
+                <span class="last-update" data-i18n="last_update">Last update: <span id="last-update-time">--</span></span>
             </div>
             <div class="queue-mini">
-                <div class="queue-mini-title">Next Tasks</div>
+                <div class="queue-mini-title" data-i18n="queue_title">Next Tasks</div>
                 <ul class="queue-mini-list" id="queue-list">
-                    <li>Loading...</li>
+                    <li data-i18n="loading">Loading...</li>
                 </ul>
             </div>
             <div class="feed-container" id="agent-log">
                 <div class="feed-item loading">
                     <span class="feed-icon">...</span>
-                    <span class="feed-text">Initializing agent feed...</span>
+                    <span class="feed-text" data-i18n="feed_init">Initializing agent feed...</span>
                 </div>
             </div>
         </section>
@@ -115,17 +119,17 @@
         <!-- Repository Health Matrix -->
         <section class="repo-matrix">
             <div class="section-header">
-                <h2>Repository Health Matrix</h2>
+                <h2 data-i18n="section_repo">Repository Health Matrix</h2>
                 <div class="matrix-legend">
-                    <span class="legend-item"><span class="legend-dot excellent"></span> Excellent</span>
-                    <span class="legend-item"><span class="legend-dot good"></span> Good</span>
-                    <span class="legend-item"><span class="legend-dot fair"></span> Fair</span>
-                    <span class="legend-item"><span class="legend-dot poor"></span> Poor</span>
+                    <span class="legend-item"><span class="legend-dot excellent"></span> <span data-i18n="legend_excellent">Excellent</span></span>
+                    <span class="legend-item"><span class="legend-dot good"></span> <span data-i18n="legend_good">Good</span></span>
+                    <span class="legend-item"><span class="legend-dot fair"></span> <span data-i18n="legend_fair">Fair</span></span>
+                    <span class="legend-item"><span class="legend-dot poor"></span> <span data-i18n="legend_poor">Poor</span></span>
                 </div>
             </div>
             <div class="repo-grid" id="repo-grid">
                 <div class="repo-card loading">
-                    <div class="repo-name">Loading repositories...</div>
+                    <div class="repo-name" data-i18n="repos_loading">Loading repositories...</div>
                 </div>
             </div>
         </section>
@@ -133,19 +137,19 @@
         <!-- Chaos Engineering Stats -->
         <section class="chaos-stats">
             <div class="section-header">
-                <h2>Chaos Engineering Status</h2>
+                <h2 data-i18n="section_chaos">Chaos Engineering Status</h2>
             </div>
             <div class="chaos-container">
                 <div class="chaos-card">
-                    <div class="chaos-label">Last Chaos Test</div>
+                    <div class="chaos-label" data-i18n="chaos_last">Last Chaos Test</div>
                     <div class="chaos-value" id="last-chaos">--</div>
                 </div>
                 <div class="chaos-card">
-                    <div class="chaos-label">Recovery Success Rate</div>
+                    <div class="chaos-label" data-i18n="chaos_success">Recovery Success Rate</div>
                     <div class="chaos-value" id="chaos-success">--</div>
                 </div>
                 <div class="chaos-card">
-                    <div class="chaos-label">Scenarios Executed</div>
+                    <div class="chaos-label" data-i18n="chaos_scenarios">Scenarios Executed</div>
                     <div class="chaos-value" id="chaos-scenarios">--</div>
                 </div>
             </div>
@@ -153,8 +157,8 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>(c) 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem</p>
-            <p class="footer-tagline">"Not a framework. Not a platform. An <span class="highlight">Operating
+            <p data-i18n="footer_line">(c) 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem</p>
+            <p class="footer-tagline" data-i18n="footer_tagline">"Not a framework. Not a platform. An <span class="highlight">Operating
                     System</span> for AI."</p>
         </footer>
     </div>

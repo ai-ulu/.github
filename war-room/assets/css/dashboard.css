@@ -138,6 +138,30 @@ body {
     color: var(--accent-green);
 }
 
+.lang-toggle {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.lang-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 245, 255, 0.4);
+    color: var(--accent-cyan);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lang-btn.active,
+.lang-btn:hover {
+    background: rgba(0, 245, 255, 0.15);
+    box-shadow: var(--glow-cyan);
+}
+
 .pulse {
     width: 10px;
     height: 10px;
