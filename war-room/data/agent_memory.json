@@ -1,56 +1,5 @@
 {
-  "activities": [
-    {
-      "icon": "[WATCH]",
-      "text": "Watcher: Watcher flagged unknown for ai-ulu/qa-repo: update check (task task_20260206151757098591)",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WAIT]",
-      "text": "Orchestrator: Cooldown active for watcher (60s) (task task_20260206151709107730)",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WATCH]",
-      "text": "Watcher: Watcher flagged unknown for ai-ulu/qa-repo: update check (task task_20260206151709107730)",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "Test: Test: action -> fail",
-      "time": "Just now"
-    }
-  ],
+  "activities": [],
   "stats": {
     "repairs": 3,
     "total_time": 10.0,
