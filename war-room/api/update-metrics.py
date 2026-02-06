@@ -299,6 +299,16 @@ def main():
                 "tr": "Sistem guclu. Siradaki hamle: dis trendleri izlemek icin 'ulu-market-analyser' reposu ac.",
             },
             {
+                "id": "cognitive_high",
+                "en": "Cognitive threshold is high. Perfecting analysis boosts safety but may slow execution. Ideal for critical expansion.",
+                "tr": "Bilissel esik yuksek. Derin analiz guvenligi artirir ama hiz dusurebilir. Kritik genisleme icin ideal.",
+            },
+            {
+                "id": "cognitive_low",
+                "en": "Cognitive threshold is low. Fast execution is enabled, but strategic risk increases. Use for routine ops only.",
+                "tr": "Bilissel esik dusuk. Hizli islem modu acik, ancak stratejik risk artar. Sadece rutin islerde kullan.",
+            },
+            {
                 "id": "docs_automation",
                 "en": "Repo mix is unbalanced. Recommend 'ulu-docs-automation' to reduce docs load.",
                 "tr": "Repo dagilimi dengesiz. Dokumantasyon yukunu azaltmak icin 'ulu-docs-automation' onerilir.",
@@ -314,19 +324,25 @@ def main():
                 "tr": "RSI dusuk. Genislemeden once cekirdek repolari stabilize et.",
             },
         ]
+        suggestions_by_id = {s["id"]: s for s in suggestions}
 
         total = max(1, sum(class_counts.values()))
         unicorn_ratio = class_counts.get('unicorn', 0) / total
         archive_ratio = class_counts.get('archive', 0) / total
+        cognitive_threshold = float(policy.get('global_thresholds', {}).get('min_cognitive_threshold', 50))
 
-        if rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)):
-            advice_pick = suggestions[3]
+        if cognitive_threshold >= 75:
+            advice_pick = suggestions_by_id["cognitive_high"]
+        elif cognitive_threshold <= 40:
+            advice_pick = suggestions_by_id["cognitive_low"]
+        elif rsi < float(policy.get('global_thresholds', {}).get('rsi_pause_chaos_below', 95)):
+            advice_pick = suggestions_by_id["quality_reinforcement"]
         elif archive_ratio > 0.3:
-            advice_pick = suggestions[1]
+            advice_pick = suggestions_by_id["docs_automation"]
         elif unicorn_ratio >= 0.6:
-            advice_pick = suggestions[2]
+            advice_pick = suggestions_by_id["api_gateway"]
         else:
-            advice_pick = suggestions[0]
+            advice_pick = suggestions_by_id["market_analyser"]
 
         # Cortex metrics
         cortex_path = os.path.join('war-room', 'data', 'cortex_log.json')
@@ -360,7 +376,7 @@ def main():
             'advice_tr': advice_pick['tr'],
             'cognitive_depth': cognitive_depth,
             'cortex_recent': cortex_tail,
-            'cognitive_threshold': float(policy.get('global_thresholds', {}).get('min_cognitive_threshold', 50)),
+            'cognitive_threshold': cognitive_threshold,
             'policy_last_update': datetime.now().isoformat()
         }
 
