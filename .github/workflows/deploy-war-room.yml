@@ -35,6 +35,14 @@ jobs:
       - name: Install dependencies
         run: |
           pip install requests PyGithub
+
+      - name: Show update-metrics snippet (debug)
+        run: |
+          python -c "from pathlib import Path; lines=Path('war-room/api/update-metrics.py').read_text(encoding='utf-8').splitlines(); start=230; end=250; print('\n'.join(f'{i+1}: {lines[i]}' for i in range(start-1, min(end, len(lines)))))"
+
+      - name: Compile update-metrics (debug)
+        run: |
+          python -m py_compile war-room/api/update-metrics.py
       
       - name: Update metrics from GitHub API
         env:
