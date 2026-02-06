@@ -20,6 +20,16 @@
       "started_at": "2026-02-06T13:05:00.242810Z",
       "completed_at": "2026-02-06T13:05:00.314844Z",
       "result": "self_heal_dispatched"
+    },
+    {
+      "id": "task_20260206131821848390",
+      "type": "SELF_HEAL",
+      "target": "system",
+      "priority": "high",
+      "created_at": "2026-02-06T13:18:21.849394Z",
+      "started_at": "2026-02-06T13:18:21.865840Z",
+      "completed_at": "2026-02-06T13:18:21.918990Z",
+      "result": "self_heal_dispatched"
     }
   ]
 }

@@ -77,3 +77,12 @@ class TaskQueue:
             "in_progress": data.get("in_progress", []),
             "completed": data.get("completed", []),
         }
+
+    def has_task(self, task_type: str) -> bool:
+        data = self._read()
+        task_type = (task_type or "").upper()
+        for bucket in ("pending", "in_progress"):
+            for task in data.get(bucket, []):
+                if (task.get("type") or "").upper() == task_type:
+                    return True
+        return False

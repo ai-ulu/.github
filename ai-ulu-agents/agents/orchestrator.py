@@ -41,6 +41,15 @@ class Orchestrator(BaseAgent):
         return "unknown_task"
 
     def run_once(self) -> None:
+        metrics = self.memory.get_sync_metrics()
+        if metrics.get("panic_status") and not self.queue.has_task("SELF_HEAL"):
+            self.queue.enqueue(
+                {
+                    "type": "SELF_HEAL",
+                    "target": "system",
+                    "priority": "high",
+                }
+            )
         task = self.queue.dequeue()
         if not task:
             return

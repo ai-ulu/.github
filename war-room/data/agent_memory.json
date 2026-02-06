@@ -2,6 +2,21 @@
   "activities": [
     {
       "icon": "[HEAL]",
+      "text": "Orchestrator: Dispatched self-heal (task task_20260206131821848390)",
+      "time": "Just now"
+    },
+    {
+      "icon": "[+]",
+      "text": "SelfHealingAgent: Healing process initiated. Resolving panic: test panic",
+      "time": "Just now"
+    },
+    {
+      "icon": "[ALARM]",
+      "text": "PANIC: test panic",
+      "time": "Just now"
+    },
+    {
+      "icon": "[HEAL]",
       "text": "Orchestrator: Dispatched self-heal (task task_23cd43d0)",
       "time": "Just now"
     },
@@ -34,21 +49,6 @@
       "icon": "[+]",
       "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
       "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "RepairAgent: RepairAgent: panic_test -> error: Simulated repair failure",
-      "time": "Just now"
-    },
-    {
-      "icon": "[ALARM]",
-      "text": "PANIC: RepairAgent failed during panic_test: Simulated repair failure",
-      "time": "Just now"
-    },
-    {
-      "icon": "[WARN]",
-      "text": "RepairAgent: RepairAgent: Fixed issue in repo-c -> Resolved lockfile mismatch",
-      "time": "Just now"
     }
   ],
   "stats": {
@@ -67,8 +67,8 @@
       0,
       0
     ],
-    "panic_count": 2,
-    "panic_resolved": 2
+    "panic_count": 3,
+    "panic_resolved": 3
   },
   "panic_status": false,
   "panic_reason": "System restored by SelfHealingAgent",
