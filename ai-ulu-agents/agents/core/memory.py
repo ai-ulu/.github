@@ -34,8 +34,13 @@ class AgentMemory:
                 )
 
     def _read(self) -> Dict[str, Any]:
-        with open(self.storage_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(self.storage_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, json.JSONDecodeError):
+            self._ensure_storage()
+            with open(self.storage_path, "r", encoding="utf-8") as f:
+                return json.load(f)
 
     def _write(self, data: Dict[str, Any]) -> None:
         with open(self.storage_path, "w", encoding="utf-8") as f:
