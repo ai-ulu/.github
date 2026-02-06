@@ -1,0 +1,12 @@
+{
+  "pending": [
+    {
+      "id": "task_001",
+      "type": "REPAIR",
+      "target": "ai-ulu/qa-repo",
+      "priority": "high"
+    }
+  ],
+  "in_progress": [],
+  "completed": []
+}

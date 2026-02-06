@@ -7,6 +7,7 @@ class WarRoomDashboard {
         this.agentLogUrl = 'data/agent-log.json';
         this.reposUrl = 'data/repos.json';
         this.memoryUrl = 'data/agent_memory.json';
+        this.queueUrl = 'data/task_queue.json';
         this.updateInterval = 30000; // 30 seconds
 
         this.init();
@@ -20,12 +21,14 @@ class WarRoomDashboard {
         await this.loadAgentLog();
         await this.loadRepositories();
         await this.checkPanic();
+        await this.loadQueueStatus();
 
         // Set up auto-refresh
         setInterval(() => this.loadMetrics(), this.updateInterval);
         setInterval(() => this.loadAgentLog(), this.updateInterval);
         setInterval(() => this.loadRepositories(), this.updateInterval * 4); // Repos update less frequently
         setInterval(() => this.checkPanic(), this.updateInterval);
+        setInterval(() => this.loadQueueStatus(), this.updateInterval);
 
         console.log('OK War Room Dashboard ready');
     }
@@ -247,6 +250,24 @@ class WarRoomDashboard {
                 second: '2-digit'
             });
             timeElement.textContent = timeString;
+        }
+    }
+
+    async loadQueueStatus() {
+        const statusEl = document.getElementById('queue-status');
+        if (!statusEl) return;
+        try {
+            const response = await fetch(this.queueUrl);
+            if (!response.ok) {
+                statusEl.textContent = 'Queue: --';
+                return;
+            }
+            const data = await response.json();
+            const pending = (data.pending || []).length;
+            const inProgress = (data.in_progress || []).length;
+            statusEl.textContent = `Queue: ${pending} pending, ${inProgress} active`;
+        } catch (error) {
+            statusEl.textContent = 'Queue: --';
         }
     }
 

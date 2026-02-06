@@ -292,6 +292,14 @@ section {
     color: var(--text-secondary);
 }
 
+.queue-status {
+    font-size: 0.9rem;
+    color: var(--accent-cyan);
+    margin-right: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 /* ========================================
    AGENT FEED
    ======================================== */
