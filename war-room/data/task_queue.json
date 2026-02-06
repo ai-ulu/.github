@@ -6,6 +6,13 @@
       "target": "ai-ulu/qa-repo",
       "priority": "normal",
       "created_at": "2026-02-06T15:04:48.004084Z"
+    },
+    {
+      "id": "task_20260206150735157702",
+      "type": "CHAOS",
+      "target": "ai-ulu/qa-repo",
+      "priority": "high",
+      "created_at": "2026-02-06T15:07:35.157702Z"
     }
   ],
   "in_progress": [],

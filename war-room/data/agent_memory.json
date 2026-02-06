@@ -1,6 +1,11 @@
 {
   "activities": [
     {
+      "icon": "[CHAOS]",
+      "text": "ChaosMonkey: Queued chaos scenario 'dependency_corruption' for ai-ulu/qa-repo",
+      "time": "Just now"
+    },
+    {
       "icon": "[WATCH]",
       "text": "Watcher: Enqueued 1 watch tasks",
       "time": "Just now"
@@ -43,11 +48,6 @@
     {
       "icon": "[HEAL]",
       "text": "Orchestrator: Dispatched self-heal (task task_23cd43d0)",
-      "time": "Just now"
-    },
-    {
-      "icon": "[+]",
-      "text": "SelfHealingAgent: Healing process initiated. Resolving panic: RepairAgent failed during panic_test: Simulated repair failure",
       "time": "Just now"
     }
   ],
