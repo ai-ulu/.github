@@ -3,6 +3,7 @@ from typing import Optional
 
 from .memory import AgentMemory
 from .task_queue import TaskQueue
+from .reporter import maybe_report_issue
 
 
 class BaseAgent:
@@ -26,6 +27,7 @@ class BaseAgent:
     def on_error(self, action: str, error: Exception) -> None:
         reason = f"{self.name} failed during {action}: {error}"
         self.memory.set_panic(True, reason)
+        maybe_report_issue(self.name, reason)
         queue = TaskQueue()
         queue.enqueue(
             {

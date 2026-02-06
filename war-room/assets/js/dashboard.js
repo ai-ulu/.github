@@ -35,7 +35,8 @@ class WarRoomDashboard {
                 chaos_scenarios: 'Scenarios Executed',
                 footer_line: '(c) 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem',
                 footer_tagline: '"Not a framework. Not a platform. An Operating System for AI."',
-                queue_empty: 'empty'
+                queue_empty: 'empty',
+                repos_meta: 'Total {total} (Public {public}, Private {private})'
             },
             tr: {
                 tagline: 'Otonom Ajan Mühendisligi - Canli Misyon Kontrol',
@@ -62,7 +63,8 @@ class WarRoomDashboard {
                 chaos_scenarios: 'Calistirilan Senaryolar',
                 footer_line: '(c) 2026 ai-ulu | Otonom Ajan Muhendisligi Ekosistemi',
                 footer_tagline: '"Bir framework degil. Bir platform degil. AI icin bir Isletim Sistemi."',
-                queue_empty: 'bos'
+                queue_empty: 'bos',
+                repos_meta: 'Toplam {total} (Acik {public}, Gizli {private})'
             }
         };
         this.lang = this.getDefaultLanguage();
@@ -183,10 +185,21 @@ class WarRoomDashboard {
         // Update Active Repos
         const reposElement = document.getElementById('repos-value');
         const reposBar = document.getElementById('repos-bar');
+        const reposMeta = document.getElementById('repos-meta');
         if (reposElement && reposBar) {
             reposElement.textContent = data.active_repos;
             const reposPercent = (data.active_repos / 40) * 100; // Assuming max 40 repos
             reposBar.style.width = `${Math.min(100, reposPercent)}%`;
+        }
+        if (reposMeta) {
+            const dict = this.translations[this.lang] || this.translations.en;
+            const total = data.total_repos ?? '--';
+            const pub = data.public_repos ?? '--';
+            const priv = data.private_repos ?? '--';
+            reposMeta.textContent = dict.repos_meta
+                .replace('{total}', total)
+                .replace('{public}', pub)
+                .replace('{private}', priv);
         }
 
         // Update Chaos Stats

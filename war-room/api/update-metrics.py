@@ -182,6 +182,9 @@ def main():
             org = gh.get_organization('ai-ulu')
             repos = list(org.get_repos())
             public_repos = [repo for repo in repos if not repo.private]
+        total_repos = len(repos)
+        public_count = len(public_repos)
+        private_count = max(0, total_repos - public_count)
         
         print(f"Found Found {len(repos)} repositories")
         
@@ -205,6 +208,9 @@ def main():
             'rsi': rsi,
             'mttr': mttr,
             'active_repos': active_repos,
+            'total_repos': total_repos,
+            'public_repos': public_count,
+            'private_repos': private_count,
             'last_chaos': memory.get("panic_at") or "none",
             'chaos_success': f"{round((panic_resolved / panic_count) * 100, 2)}%" if panic_count > 0 else "0%",
             'chaos_scenarios': panic_count,

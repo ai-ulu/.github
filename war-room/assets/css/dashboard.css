@@ -275,6 +275,12 @@ body {
     box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
 }
 
+.metric-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
 .aor .metric-value { color: var(--accent-green); text-shadow: var(--glow-green); }
 .aor .metric-bar-fill { background: var(--gradient-green); }
 
