@@ -9,6 +9,7 @@ from .core.base_agent import BaseAgent
 from .core.memory import AgentMemory
 from .core.task_queue import TaskQueue
 from .core.registry import AgentRegistry
+from .core.cortex import CortexFilter
 from .repair_agent import RepairAgent
 from .self_healing_agent import SelfHealingAgent
 from .chaos_monkey import ChaosMonkey
@@ -26,6 +27,7 @@ class Orchestrator(BaseAgent):
         super().__init__(name="Orchestrator", memory=memory)
         self.queue = queue or TaskQueue()
         self.registry = AgentRegistry()
+        self.cortex = CortexFilter()
         self.poll_seconds = poll_seconds
 
     def _is_allowed(self, target: str) -> bool:
@@ -233,6 +235,12 @@ class Orchestrator(BaseAgent):
             self.log_activity(f"Chaos disabled by policy for {target}", icon="[BLOCK]", task_id=task.get("id", ""))
             self.queue.complete(task, "blocked_by_policy")
             return
+        cortex_entry = self.cortex.evaluate(task, metrics)
+        self.log_activity(
+            f"Cortex score {cortex_entry['score']} for {task_type} on {target}",
+            icon="[CORTEX]",
+            task_id=task.get("id", ""),
+        )
         if repo_policy.get("class") == "archive":
             self.log_activity(f"Archive repo flagged for migration: {target}", icon="[ARCHIVE]", task_id=task.get("id", ""))
         result = self.dispatch(task)
