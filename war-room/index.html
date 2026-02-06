@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ai-ulu War Room | Autonomous AI Operating System</title>
+    <meta name="description" content="Real-time mission control for the ai-ulu autonomous engineering ecosystem">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Matrix Background Effect -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🏰</span>
+                <h1>ai-ulu <span class="highlight">War Room</span></h1>
+            </div>
+            <p class="tagline">Autonomous Agentic Engineering • Live Mission Control</p>
+            <div class="status-indicator">
+                <span class="pulse"></span>
+                <span class="status-text">SYSTEM OPERATIONAL</span>
+            </div>
+        </header>
+
+        <!-- Hero Metrics -->
+        <section class="hero-metrics">
+            <div class="metric-card aor">
+                <div class="metric-icon">⚡</div>
+                <div class="metric-content">
+                    <span class="metric-label">Autonomous Operation Rate</span>
+                    <div class="metric-value-container">
+                        <span class="metric-value" id="aor-value">--</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" id="aor-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rsi">
+                <div class="metric-icon">🛡️</div>
+                <div class="metric-content">
+                    <span class="metric-label">Resilience Stability Index</span>
+                    <div class="metric-value-container">
+                        <span class="metric-value" id="rsi-value">--</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" id="rsi-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card mttr">
+                <div class="metric-icon">⏱️</div>
+                <div class="metric-content">
+                    <span class="metric-label">Mean Time To Repair</span>
+                    <div class="metric-value-container">
+                        <span class="metric-value" id="mttr-value">--</span>
+                        <span class="metric-unit">min</span>
+                    </div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" id="mttr-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card repos">
+                <div class="metric-icon">📦</div>
+                <div class="metric-content">
+                    <span class="metric-label">Active Repositories</span>
+                    <div class="metric-value-container">
+                        <span class="metric-value" id="repos-value">--</span>
+                        <span class="metric-unit"></span>
+                    </div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" id="repos-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Agent Feed -->
+        <section class="agent-feed">
+            <div class="section-header">
+                <h2>🤖 Live Agent Activity</h2>
+                <span class="last-update">Last update: <span id="last-update-time">--</span></span>
+            </div>
+            <div class="feed-container" id="agent-log">
+                <div class="feed-item loading">
+                    <span class="feed-icon">⏳</span>
+                    <span class="feed-text">Initializing agent feed...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Repository Health Matrix -->
+        <section class="repo-matrix">
+            <div class="section-header">
+                <h2>📊 Repository Health Matrix</h2>
+                <div class="matrix-legend">
+                    <span class="legend-item"><span class="legend-dot excellent"></span> Excellent</span>
+                    <span class="legend-item"><span class="legend-dot good"></span> Good</span>
+                    <span class="legend-item"><span class="legend-dot fair"></span> Fair</span>
+                    <span class="legend-item"><span class="legend-dot poor"></span> Poor</span>
+                </div>
+            </div>
+            <div class="repo-grid" id="repo-grid">
+                <div class="repo-card loading">
+                    <div class="repo-name">Loading repositories...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chaos Engineering Stats -->
+        <section class="chaos-stats">
+            <div class="section-header">
+                <h2>🌀 Chaos Engineering Status</h2>
+            </div>
+            <div class="chaos-container">
+                <div class="chaos-card">
+                    <div class="chaos-label">Last Chaos Test</div>
+                    <div class="chaos-value" id="last-chaos">--</div>
+                </div>
+                <div class="chaos-card">
+                    <div class="chaos-label">Recovery Success Rate</div>
+                    <div class="chaos-value" id="chaos-success">--</div>
+                </div>
+                <div class="chaos-card">
+                    <div class="chaos-label">Scenarios Executed</div>
+                    <div class="chaos-value" id="chaos-scenarios">--</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 ai-ulu | Autonomous Agentic Engineering Ecosystem</p>
+            <p class="footer-tagline">"Not a framework. Not a platform. An <span class="highlight">Operating
+                    System</span> for AI."</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/matrix.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+
+</html>
