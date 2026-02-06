@@ -21,13 +21,17 @@ class Orchestrator(BaseAgent):
 
     def dispatch(self, task):
         task_type = (task.get("type") or "").upper()
+        task_id = task.get("id", "")
         if task_type == "REPAIR":
             agent = RepairAgent(memory=self.memory)
-            agent.report_dependency_issue(task.get("target", "unknown"), "queued repair")
+            target = task.get("target", "unknown")
+            agent.report_dependency_issue(target, "queued repair")
+            self.log_activity(f"Dispatched repair to {target}", icon="[REPAIR]", task_id=task_id)
             return "repair_dispatched"
         if task_type == "SELF_HEAL":
             agent = SelfHealingAgent(memory=self.memory)
             agent.check_system_health()
+            self.log_activity("Dispatched self-heal", icon="[HEAL]", task_id=task_id)
             return "self_heal_dispatched"
         self.log_activity(f"Unknown task type: {task_type}", icon="[WARN]")
         return "unknown_task"

@@ -300,6 +300,37 @@ section {
     letter-spacing: 1px;
 }
 
+.queue-mini {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 10px;
+    background: rgba(10, 14, 39, 0.5);
+}
+
+.queue-mini-title {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.queue-mini-list {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.queue-mini-list li {
+    padding: 4px 8px;
+    border: 1px solid rgba(0, 245, 255, 0.3);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--accent-cyan);
+}
+
 /* ========================================
    AGENT FEED
    ======================================== */

@@ -55,13 +55,16 @@ class AgentMemory:
         stats["ops_window"] = ops_window[-20:]
         self._write(data)
 
-    def record_activity(self, agent_name: str, text: str, icon: str = "[#]") -> None:
+    def record_activity(
+        self, agent_name: str, text: str, icon: str = "[#]", task_id: str = ""
+    ) -> None:
         data = self._read()
+        task_suffix = f" (task {task_id})" if task_id else ""
         data["activities"].insert(
             0,
             {
                 "icon": icon,
-                "text": f"{agent_name}: {text}",
+                "text": f"{agent_name}: {text}{task_suffix}",
                 "time": "Just now",
             },
         )

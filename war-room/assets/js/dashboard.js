@@ -255,19 +255,35 @@ class WarRoomDashboard {
 
     async loadQueueStatus() {
         const statusEl = document.getElementById('queue-status');
+        const listEl = document.getElementById('queue-list');
         if (!statusEl) return;
         try {
             const response = await fetch(this.queueUrl);
             if (!response.ok) {
                 statusEl.textContent = 'Queue: --';
+                if (listEl) listEl.innerHTML = '<li>--</li>';
                 return;
             }
             const data = await response.json();
             const pending = (data.pending || []).length;
             const inProgress = (data.in_progress || []).length;
             statusEl.textContent = `Queue: ${pending} pending, ${inProgress} active`;
+            if (listEl) {
+                const items = (data.pending || []).slice(0, 3);
+                if (items.length === 0) {
+                    listEl.innerHTML = '<li>empty</li>';
+                } else {
+                    listEl.innerHTML = items
+                        .map((task) => {
+                            const type = (task.type || 'TASK').toUpperCase();
+                            return `<li>[${type}]</li>`;
+                        })
+                        .join('');
+                }
+            }
         } catch (error) {
             statusEl.textContent = 'Queue: --';
+            if (listEl) listEl.innerHTML = '<li>--</li>';
         }
     }
 

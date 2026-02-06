@@ -36,13 +36,22 @@ class TaskQueue:
 
     def dequeue(self) -> Dict[str, Any]:
         data = self._read()
-        if not data["pending"]:
+        task = self.get_next_task(data)
+        if not task:
             return {}
-        task = data["pending"].pop(0)
+        pending = data.get("pending", [])
+        data["pending"] = [t for t in pending if t is not task]
         task["started_at"] = datetime.utcnow().isoformat() + "Z"
         data["in_progress"].append(task)
         self._write(data)
         return task
+
+    def get_next_task(self, data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Any]:
+        pending = data.get("pending", [])
+        if not pending:
+            return {}
+        high = [t for t in pending if (t.get("priority") or "").lower() == "high"]
+        return high[0] if high else pending[0]
 
     def complete(self, task: Dict[str, Any], result: str) -> None:
         data = self._read()
