@@ -171,6 +171,23 @@ def get_repo_health(aura):
     else:
         return 'poor'
 
+def build_repo_data(public_repos):
+    """Build repo data payloads for repos.json"""
+    repo_data = []
+    for repo in public_repos:
+        aura = calculate_repo_aura(repo)
+        repo_data.append(
+            {
+                'name': repo.name,
+                'aura': aura,
+                'health': get_repo_health(aura),
+                'category': 'unicorn' if aura >= 90 else 'muscle',
+                'updated_at': repo.updated_at.isoformat() if repo.updated_at else None,
+                'stars': repo.stargazers_count,
+            }
+        )
+    return repo_data
+
 def main():
     print("Updating Updating War Room Dashboard metrics...")
     
@@ -236,19 +253,7 @@ def main():
         print(f"OK Agent log updated with {len(activities)} activities")
         
         # Update repos.json (safe-fail if no API data)
-        repo_data = []
-        for repo in public_repos:
-            aura = calculate_repo_aura(repo)
-            repo_data.append(
-                {
-                    'name': repo.name,
-                    'aura': aura,
-                    'health': get_repo_health(aura),
-                    'category': 'unicorn' if aura >= 90 else 'muscle',
-                    'updated_at': repo.updated_at.isoformat() if repo.updated_at else None,
-                    'stars': repo.stargazers_count,
-                }
-            )
+        repo_data = build_repo_data(public_repos)
 
         if not repo_data:
             print("Warning: no repo data from API; keeping existing repos.json")
