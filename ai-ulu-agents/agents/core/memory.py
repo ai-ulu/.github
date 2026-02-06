@@ -29,6 +29,7 @@ class AgentMemory:
                         "panic_status": False,
                         "panic_reason": None,
                         "panic_at": None,
+                        "last_issue": None,
                     },
                     f,
                     indent=2,
@@ -111,6 +112,24 @@ class AgentMemory:
                 },
             )
             data["activities"] = data["activities"][:10]
+        self._write(data)
+
+    def record_issue(self, repo: str, issue_number: int) -> None:
+        data = self._read()
+        data["last_issue"] = {
+            "repo": repo,
+            "number": issue_number,
+            "opened_at": datetime.utcnow().isoformat() + "Z",
+        }
+        self._write(data)
+
+    def get_last_issue(self) -> Dict[str, Any]:
+        data = self._read()
+        return data.get("last_issue") or {}
+
+    def clear_last_issue(self) -> None:
+        data = self._read()
+        data["last_issue"] = None
         self._write(data)
 
     def get_sync_metrics(self) -> Dict[str, Any]:

@@ -2,6 +2,7 @@ from typing import Optional
 
 from .core.base_agent import BaseAgent
 from .core.memory import AgentMemory
+from .core.reporter import maybe_close_issue
 
 
 class SelfHealingAgent(BaseAgent):
@@ -19,3 +20,7 @@ class SelfHealingAgent(BaseAgent):
             icon="[+]",
         )
         self.memory.set_panic(False, "System restored by SelfHealingAgent")
+        last_issue = self.memory.get_last_issue()
+        if last_issue:
+            maybe_close_issue(last_issue.get("repo", ""), int(last_issue.get("number", 0)))
+            self.memory.clear_last_issue()

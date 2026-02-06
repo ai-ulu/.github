@@ -1,3 +1,4 @@
+import os
 import uuid
 from typing import Optional
 
@@ -27,7 +28,9 @@ class BaseAgent:
     def on_error(self, action: str, error: Exception) -> None:
         reason = f"{self.name} failed during {action}: {error}"
         self.memory.set_panic(True, reason)
-        maybe_report_issue(self.name, reason)
+        issue_number = maybe_report_issue(self.name, reason)
+        if issue_number:
+            self.memory.record_issue(os.getenv("REPORT_REPO", ""), issue_number)
         queue = TaskQueue()
         queue.enqueue(
             {
