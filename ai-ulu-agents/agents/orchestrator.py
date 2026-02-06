@@ -241,6 +241,16 @@ class Orchestrator(BaseAgent):
             icon="[CORTEX]",
             task_id=task.get("id", ""),
         )
+        min_cognitive = float(policy.get("global_thresholds", {}).get("min_cognitive_threshold", 0))
+        cortex_percent = float(cortex_entry.get("score", 0)) * 10
+        if cortex_percent < min_cognitive:
+            self.log_activity(
+                f"Cortex rejected task ({cortex_percent:.0f} < {min_cognitive:.0f}) for {task_type} on {target}",
+                icon="[CORTEX]",
+                task_id=task.get("id", ""),
+            )
+            self.queue.complete(task, "cortex_rejected")
+            return
         if repo_policy.get("class") == "archive":
             self.log_activity(f"Archive repo flagged for migration: {target}", icon="[ARCHIVE]", task_id=task.get("id", ""))
         result = self.dispatch(task)

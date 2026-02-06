@@ -1,6 +1,7 @@
 {
   "global_thresholds": {
-    "rsi_pause_chaos_below": 90
+    "rsi_pause_chaos_below": 90,
+    "min_cognitive_threshold": 50
   },
   "prioritize_unicorn": true,
   "defer_chaos_when_rsi_low": true,

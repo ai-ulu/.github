@@ -48,6 +48,8 @@ class WarRoomDashboard {
                 strategic_advice: 'Strategic Advice'
                 ,cortex_depth: 'Cognitive Depth'
                 ,cortex_recent: 'Recent Cortex Decisions'
+                ,cortex_slider: 'Cognitive Slider'
+                ,cortex_slider_note: 'Update policy.json or run set-cognitive-threshold.py to persist.'
             },
             tr: {
                 tagline: 'Otonom Ajan Mühendisligi - Canli Misyon Kontrol',
@@ -85,6 +87,8 @@ class WarRoomDashboard {
                 strategic_advice: 'Stratejik Tavsiye'
                 ,cortex_depth: 'Bilissel Derinlik'
                 ,cortex_recent: 'Son Cortex Kararlari'
+                ,cortex_slider: 'Bilissel Surgu'
+                ,cortex_slider_note: 'Kalici yapmak icin policy.json guncelle veya set-cognitive-threshold.py calistir.'
             }
         };
         this.lang = this.getDefaultLanguage();
@@ -105,6 +109,7 @@ class WarRoomDashboard {
         await this.loadQueueStatus();
         await this.loadClassifyStatus();
         await this.loadKingdomMap();
+        this.bindCortexSlider();
 
         // Set up auto-refresh
         setInterval(() => this.loadMetrics(), this.updateInterval);
@@ -142,6 +147,22 @@ class WarRoomDashboard {
                 this.setLanguage(next);
                 buttons.forEach((b) => b.classList.toggle('active', b.dataset.lang === next));
             });
+        });
+    }
+
+    bindCortexSlider() {
+        const slider = document.getElementById('cortex-threshold');
+        const valueEl = document.getElementById('cortex-threshold-value');
+        if (!slider || !valueEl) return;
+        const stored = localStorage.getItem('cortex_threshold_override');
+        if (stored) {
+            slider.value = stored;
+            valueEl.textContent = stored;
+        }
+        slider.addEventListener('input', () => {
+            const value = slider.value;
+            valueEl.textContent = value;
+            localStorage.setItem('cortex_threshold_override', value);
         });
     }
 
@@ -495,6 +516,13 @@ class WarRoomDashboard {
                         .join('');
                 }
             }
+
+            const slider = document.getElementById('cortex-threshold');
+            const sliderValue = document.getElementById('cortex-threshold-value');
+            const stored = localStorage.getItem('cortex_threshold_override');
+            const threshold = stored ?? data.cognitive_threshold ?? 50;
+            if (slider) slider.value = threshold;
+            if (sliderValue) sliderValue.textContent = threshold;
         } catch (error) {
             // noop
         }

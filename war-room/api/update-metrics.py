@@ -360,6 +360,7 @@ def main():
             'advice_tr': advice_pick['tr'],
             'cognitive_depth': cognitive_depth,
             'cortex_recent': cortex_tail,
+            'cognitive_threshold': float(policy.get('global_thresholds', {}).get('min_cognitive_threshold', 50)),
             'policy_last_update': datetime.now().isoformat()
         }
 
