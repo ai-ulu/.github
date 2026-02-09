@@ -1,0 +1,42 @@
+{
+  "version": "2.0",
+  "activities": [],
+  "stats": {
+    "repairs": 0,
+    "total_time": 0.0,
+    "repair_times": [],
+    "operations": 0,
+    "ops_window": [],
+    "panic_count": 0,
+    "panic_resolved": 0,
+    "agent_stats": {}
+  },
+  "rsi_history": [
+    {
+      "value": 98.5,
+      "timestamp": "2026-02-08T21:30:26.138016Z"
+    },
+    {
+      "value": 97.8,
+      "timestamp": "2026-02-08T21:30:26.140103Z"
+    },
+    {
+      "value": 98.5,
+      "timestamp": "2026-02-08T21:31:02.919137Z"
+    },
+    {
+      "value": 97.8,
+      "timestamp": "2026-02-08T21:31:02.920648Z"
+    }
+  ],
+  "file_locks": {},
+  "panic_status": false,
+  "panic_reason": null,
+  "panic_at": null,
+  "last_issue": null,
+  "agent_coordination": {
+    "active_agents": [],
+    "claimed_tasks": {},
+    "resource_usage": {}
+  }
+}

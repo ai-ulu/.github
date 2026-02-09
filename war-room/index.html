@@ -4,9 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' fonts.googleapis.com 'unsafe-inline'; font-src 'self' fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>ai-ulu War Room | Autonomous AI Operating System</title>
     <meta name="description" content="Real-time mission control for the ai-ulu autonomous engineering ecosystem">
     <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/neural-link.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -220,6 +226,11 @@
     <script src="assets/js/matrix.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/neural-link.js"></script>
+    <!-- Phase 8: Voice Commands -->
+    <script src="assets/js/voice-commands.js"></script>
+    <!-- Phase 9: Video Wall & Advanced Viz -->
+    <script src="assets/js/video-wall.js"></script>
 </body>
 
 </html>

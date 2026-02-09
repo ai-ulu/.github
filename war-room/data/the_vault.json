@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "vision": {
+    "last_updated": "2026-02-08T21:30:26.135967Z",
+    "mission_statement": "Build an autonomous AI engineering ecosystem that self-heals, self-improves, and operates with minimal human intervention.",
+    "target_aor": 95.0,
+    "target_rsi": 99.0,
+    "target_mttr": 3.0,
+    "strategic_goals": [
+      "Achieve 95%+ autonomous operation rate",
+      "Maintain RSI above 99%",
+      "Grow unicorn portfolio to 5+ products",
+      "Reduce MTTR to under 3 minutes"
+    ],
+    "active_initiatives": [
+      "Chaos engineering expansion",
+      "Multi-LLM integration",
+      "Self-healing pipeline",
+      "War Room dashboard enhancement"
+    ],
+    "unicorn_target_count": 5,
+    "chaos_schedule": "weekly",
+    "cognitive_depth_target": 70
+  },
+  "decisions": [
+    {
+      "id": "dec_20260208213102_system",
+      "timestamp": "2026-02-08T21:31:02.996856Z",
+      "decision_type": "agent_policy",
+      "target": "system",
+      "decision": "Enable aggressive chaos testing on muscle tier",
+      "reasoning": "Need to validate resilience before scaling",
+      "expected_outcome": "Improved RSI and reduced MTTR",
+      "status": "active",
+      "revoked_at": null,
+      "revoked_reason": null
+    },
+    {
+      "id": "dec_20260208213102_GodFather",
+      "timestamp": "2026-02-08T21:31:02.977104Z",
+      "decision_type": "repo_classification",
+      "target": "GodFather",
+      "decision": "Classified as unicorn",
+      "reasoning": "Central governance system with high commercial potential",
+      "expected_outcome": "Optimized resource allocation for unicorn tier",
+      "status": "active",
+      "revoked_at": null,
+      "revoked_reason": null
+    }
+  ],
+  "repo_roles": {
+    "GodFather": {
+      "repo_name": "GodFather",
+      "assigned_class": "unicorn",
+      "assigned_at": "2026-02-08T21:31:02.950506Z",
+      "assigned_by": "godfather",
+      "priority_weight": 1.0,
+      "allowed_agents": [],
+      "chaos_allowed": true,
+      "description": "",
+      "commercial_potential": 95,
+      "technical_maturity": 90,
+      "strategic_notes": []
+    }
+  },
+  "policy_overrides": {}
+}

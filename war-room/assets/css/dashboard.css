@@ -724,6 +724,41 @@ section {
 }
 
 /* ========================================
+   ERROR BANNER
+   ======================================== */
+
+.error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px;
+    text-align: center;
+    font-weight: 600;
+    z-index: 10000;
+    animation: slideDown 0.3s ease;
+}
+
+.error-banner.warning {
+    background: linear-gradient(90deg, #ffcc00, #ff9900);
+    color: #000;
+}
+
+.error-banner.error {
+    background: linear-gradient(90deg, #ff0055, #cc0044);
+    color: #fff;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
    LOADING STATES
    ======================================== */
 

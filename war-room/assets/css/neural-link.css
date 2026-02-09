@@ -1,0 +1,289 @@
+/* Neural Link Animations & Styles */
+
+/* Neural Link Animations */
+.feed-item.new {
+    animation: pulseHighlight 2s ease;
+    background: rgba(0, 255, 136, 0.2) !important;
+    border-left: 3px solid #00ff88 !important;
+}
+
+@keyframes pulseHighlight {
+    0% { background: rgba(0, 255, 136, 0.4); }
+    50% { background: rgba(0, 255, 136, 0.2); }
+    100% { background: rgba(0, 245, 255, 0.05); }
+}
+
+/* Connection Status Indicator */
+.neural-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--accent-green);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 10000;
+}
+
+.neural-status.connected {
+    background: rgba(0, 255, 136, 0.2);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.neural-status.disconnected {
+    background: rgba(255, 0, 85, 0.2);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
+.neural-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: neuralPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes neuralPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* LLM Banner */
+.llm-banner {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 450px;
+    background: linear-gradient(135deg, #1a1f3a, #2d1b4e);
+    border: 2px solid #b24bf3;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(178, 75, 243, 0.3),
+                0 0 60px rgba(178, 75, 243, 0.1);
+    z-index: 10000;
+    animation: slideUp 0.3s ease;
+    font-family: var(--font-body);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.llm-banner-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(178, 75, 243, 0.3);
+}
+
+.llm-icon {
+    font-size: 28px;
+    animation: brainPulse 2s ease-in-out infinite;
+}
+
+@keyframes brainPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.llm-banner-header h4 {
+    flex: 1;
+    margin: 0;
+    color: #b24bf3;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+}
+
+.confidence {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.llm-banner-body {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.llm-banner-body p {
+    margin: 8px 0;
+}
+
+.llm-banner-body strong {
+    color: var(--text-primary);
+}
+
+.llm-banner-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-approve {
+    flex: 1;
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    border: none;
+    color: #000;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+}
+
+.btn-reject {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.btn-reject:hover {
+    background: rgba(255, 0, 85, 0.2);
+    border-color: var(--accent-red);
+}
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    animation: slideInRight 0.3s ease;
+    z-index: 10001;
+    font-family: var(--font-body);
+    backdrop-filter: blur(10px);
+}
+
+.toast-success { 
+    background: rgba(0, 255, 136, 0.9); 
+    color: #000;
+    border: 1px solid var(--accent-green);
+}
+
+.toast-error { 
+    background: rgba(255, 0, 85, 0.9);
+    border: 1px solid var(--accent-red);
+}
+
+.toast-info { 
+    background: rgba(0, 245, 255, 0.9); 
+    color: #000;
+    border: 1px solid var(--accent-cyan);
+}
+
+.toast-panic { 
+    background: linear-gradient(90deg, #ff0055, #ff0000);
+    border: 1px solid #ff0000;
+    animation: panicPulse 0.5s infinite;
+    font-weight: 700;
+}
+
+@keyframes panicPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Real-time indicator in header */
+.real-time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--accent-green);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--accent-green);
+    margin-left: 10px;
+}
+
+.real-time-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    animation: livePulse 1s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Agent connection list */
+.agent-list {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 150px;
+    z-index: 9999;
+}
+
+.agent-list h4 {
+    margin: 0 0 10px 0;
+    color: var(--accent-cyan);
+    font-size: 0.9rem;
+    font-family: var(--font-display);
+}
+
+.agent-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.agent-item::before {
+    content: '🤖';
+    font-size: 0.8rem;
+}
+
+.agent-item.online::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    margin-left: auto;
+}

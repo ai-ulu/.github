@@ -1,6 +1,23 @@
 // AI-ULU War Room Dashboard
 // Real-time metrics and agent activity monitoring
 
+// Constants
+const CONSTANTS = {
+    UPDATE_INTERVAL: 30000,        // 30 seconds
+    MAX_REPOS: 40,                 // Maximum expected repos
+    MTTR_MAX_MINUTES: 10,          // MTTR normalization factor
+    OPS_WINDOW_SIZE: 20,           // Operations window for RSI
+    REPAIR_HISTORY_SIZE: 100,      // Max repair times to keep
+    MAX_ACTIVITIES: 10,            // Activities to display
+    MAX_DECISIONS: 1000,           // Strategic decisions to keep
+    MAX_RSI_HISTORY: 1000,         // RSI readings to keep
+    CACHE_TTL: 1.0,                // Cache TTL in seconds
+    LOCK_TIMEOUT: 10.0,            // File lock timeout
+    TARGET_AOR: 95.0,              // Target Autonomous Operation Rate
+    TARGET_RSI: 99.0,              // Target Resilience Stability Index
+    TARGET_MTTR: 3.0               // Target Mean Time To Repair (minutes)
+};
+
 class WarRoomDashboard {
     constructor() {
         this.metricsUrl = 'data/metrics.json';
@@ -10,7 +27,8 @@ class WarRoomDashboard {
         this.queueUrl = 'data/task_queue.json';
         this.classifyUrl = 'data/classify_queue.json';
         this.dashboardDataUrl = 'data/dashboard_data.json';
-        this.updateInterval = 30000; // 30 seconds
+        this.updateInterval = CONSTANTS.UPDATE_INTERVAL;
+        this.errors = []; // Track errors for display
         this.translations = {
             en: {
                 tagline: 'Autonomous Agentic Engineering - Live Mission Control',
@@ -179,19 +197,69 @@ class WarRoomDashboard {
         });
     }
 
+    showErrorBanner(message, type = 'warning') {
+        // Create error banner if it doesn't exist
+        let banner = document.getElementById('error-banner');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'error-banner';
+            banner.className = 'error-banner';
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
+        
+        banner.textContent = message;
+        banner.className = `error-banner ${type}`;
+        banner.style.display = 'block';
+        
+        // Auto-hide after 5 seconds for warnings
+        if (type === 'warning') {
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Track error
+        this.errors.push({
+            message,
+            type,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Keep only last 10 errors
+        if (this.errors.length > 10) {
+            this.errors.shift();
+        }
+    }
+
     async loadMetrics() {
         try {
             const response = await fetch(this.metricsUrl);
             if (!response.ok) {
                 // Use fallback data if file doesn't exist yet
+                this.showErrorBanner(
+                    this.lang === 'tr' 
+                        ? 'Metrikler yüklenemedi, önbellek kullanılıyor' 
+                        : 'Metrics unavailable, using cached data',
+                    'warning'
+                );
                 this.useFallbackMetrics();
                 return;
             }
 
             const data = await response.json();
             this.updateMetrics(data);
+            
+            // Clear error if successful
+            const banner = document.getElementById('error-banner');
+            if (banner) banner.style.display = 'none';
         } catch (error) {
             console.warn('Using fallback metrics:', error);
+            this.showErrorBanner(
+                this.lang === 'tr' 
+                    ? 'Bağlantı hatası, önbellek kullanılıyor' 
+                    : 'Connection error, using cached data',
+                'error'
+            );
             this.useFallbackMetrics();
         }
     }
