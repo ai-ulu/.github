@@ -1,20 +1,9 @@
 {
   "activities": [
-    {
-      "icon": "[REPAIR]",
-      "text": "Repair Agent: System monitoring active across all repositories",
-      "time": "Just now"
-    },
-    {
-      "icon": "[MEDIA]",
-      "text": "Media Agent: Ready to generate marketing content",
-      "time": "5 min ago"
-    },
-    {
-      "icon": "[CHAOS]",
-      "text": "Chaos Monkey: Scheduled for next Monday 02:00 UTC",
-      "time": "1 hour ago"
-    }
-  ],
-  "last_update": "2026-02-07T01:22:09.683186"
+    {"icon": "[🦄]", "text": "AI-ULU activated on gitaura - Chaos Monkey enabled", "time": "Just now"},
+    {"icon": "[🦄]", "text": "AI-ULU activated on UluCore - Auto-fix enabled", "time": "5 min ago"},
+    {"icon": "[💪]", "text": "AI-ULU activated on ai-ulu.github.io", "time": "10 min ago"},
+    {"icon": "[💪]", "text": "AI-ULU activated on Clone-Os", "time": "15 min ago"},
+    {"icon": "[📦]", "text": "AI-ULU activated on cloneos-ai-agent-desktop (read-only)", "time": "20 min ago"}
+  ]
 }
