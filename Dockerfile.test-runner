@@ -6,6 +6,7 @@
 FROM node:20-alpine AS builder
 
 # Install system dependencies with security updates
+# Includes libraries for canvas and opencv native builds
 RUN apk add --no-cache --update \
     chromium \
     nss \
@@ -17,6 +18,15 @@ RUN apk add --no-cache --update \
     python3 \
     make \
     g++ \
+    gcc \
+    libc6-compat \
+    pixman-dev \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    libpng-dev \
+    cmake \
     && apk upgrade \
     && rm -rf /var/cache/apk/*
 
