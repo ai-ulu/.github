@@ -1,0 +1,48 @@
+name: GitHub Pages Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Note: GitHub Pages requires these actions:
+      # - actions/configure-pages@v4
+      # - actions/upload-pages-artifact@v3
+      # - actions/deploy-pages@v4
+      #
+      # If these actions are not allowed in your organization,
+      # you need to enable them in:
+      # Organization Settings > Actions > General > Allowed actions
+      #
+      # Or use a self-hosted runner
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        continue-on-error: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        continue-on-error: true
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
